@@ -50,6 +50,10 @@ func _apply_action(amount: int, text: String) -> void:
 	_render()
 	if int(mothling.get("trust", 0)) >= 80:
 		message.text += "\n\nIt doesn't retreat when you step closer anymore."
+		$Margin/VBox/Leave.text = "Invite to Sanctuary"
 
 func _leave() -> void:
-	get_tree().change_scene_to_file("res://scenes/lure_sites/whispering_woods.tscn")
+	if int(mothling.get("trust", 0)) >= 80:
+		get_tree().change_scene_to_file("res://scenes/adoption/adopt_mothling.tscn")
+	else:
+		get_tree().change_scene_to_file("res://scenes/lure_sites/whispering_woods.tscn")

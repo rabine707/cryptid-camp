@@ -39,6 +39,9 @@ func _ready() -> void:
 	cryptid_defs = _load_json(CRYPTIDS_PATH)
 	$Margin/VBox/Header/Back.pressed.connect(_go_back)
 	observe_button.pressed.connect(_begin_observation)
+	CampStyle.button($Margin/VBox/Header/Back, "wood")
+	CampStyle.button(observe_button, "green")
+	CampStyle.parchment($Margin/VBox/ClearingPanel)
 	_build_clearing()
 	_build_inventory()
 	_refresh()
@@ -58,6 +61,7 @@ func _build_clearing() -> void:
 		slot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		slot.name = "Slot%d" % i
 		slot.pressed.connect(_remove_from_slot.bind(i))
+		CampStyle.button(slot, "paper")
 		clearing.add_child(slot)
 
 func _build_inventory() -> void:
@@ -66,6 +70,7 @@ func _build_inventory() -> void:
 		button.custom_minimum_size = Vector2(285, 92)
 		button.text = "%s  %s" % [ICONS.get(object_id, "•"), object_defs.get(object_id, {}).get("name", object_id)]
 		button.pressed.connect(_place_object.bind(object_id))
+		CampStyle.button(button, "wood")
 		inventory.add_child(button)
 
 func _place_object(object_id: String) -> void:

@@ -19,3 +19,8 @@ No combat, gacha, accounts, multiplayer, or store in this milestone.
 - Simulation separated from presentation
 
 See `docs/GAME_DESIGN.md` and `docs/BEANS_MILESTONE.md`.
+
+
+## Art pipeline
+
+Prototype visuals are deliberately replaceable. Gameplay references semantic art slots, with safe placeholders until production artwork exists. See `docs/ART_PIPELINE.md` and `data/art_manifest.json`.

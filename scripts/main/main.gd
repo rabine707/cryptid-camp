@@ -8,4 +8,4 @@ func _open_whispering_woods() -> void:
 	get_tree().change_scene_to_file("res://scenes/lure_sites/whispering_woods.tscn")
 
 func _open_sanctuary() -> void:
-	print("Sanctuary: Beans will live here.")
+	get_tree().change_scene_to_file("res://scenes/sanctuary/sanctuary.tscn")

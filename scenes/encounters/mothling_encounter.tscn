@@ -94,6 +94,11 @@ text = "It watches you carefully."
 autowrap_mode = 2
 horizontal_alignment = 1
 
+[node name="DevTrust" type="Button" parent="Margin/VBox"]
+custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
+text = "DEV TEST  +20 TRUST"
+
 [node name="Leave" type="Button" parent="Margin/VBox"]
 custom_minimum_size = Vector2(0, 90)
 layout_mode = 2

@@ -9,6 +9,12 @@ extends Control
 var resident: Dictionary = {}
 
 func _ready() -> void:
+	CampStyle.button($Margin/VBox/Header/Back, "wood")
+	CampStyle.button(lamp_button, "green")
+	CampStyle.parchment($Margin/VBox/ResidentArea)
+	resident_name.add_theme_color_override("font_color", CampStyle.INK)
+	resident_details.add_theme_color_override("font_color", CampStyle.INK)
+	creature.add_theme_color_override("font_color", CampStyle.INK)
 	$Margin/VBox/Header/Back.pressed.connect(_go_map)
 	lamp_button.pressed.connect(_place_lamp)
 	resident = GameState.get_adopted_species("mothling")

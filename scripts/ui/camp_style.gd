@@ -1,3 +1,4 @@
+class_name CampStyle
 extends RefCounted
 
 const CREAM := Color("#f1e6c8")

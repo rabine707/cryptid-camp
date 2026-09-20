@@ -5,7 +5,7 @@ func _ready() -> void:
 	$Margin/VBox/Sanctuary.pressed.connect(_open_sanctuary)
 
 func _open_whispering_woods() -> void:
-	print("Whispering Woods: lure-site prototype next.")
+	get_tree().change_scene_to_file("res://scenes/lure_sites/whispering_woods.tscn")
 
 func _open_sanctuary() -> void:
 	print("Sanctuary: Beans will live here.")

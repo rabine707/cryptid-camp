@@ -1,4 +1,4 @@
-name: Build Godot Web
+name: Build and Deploy Godot Web
 
 on:
   push:
@@ -10,6 +10,12 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   build-web:
@@ -47,7 +53,7 @@ jobs:
         run: |
           mkdir -p build/web
           /tmp/godot/godot --headless --path . --export-release "Web" build/web/index.html
-          cp deploy/vercel.json build/web/vercel.json
+          touch build/web/.nojekyll
 
       - name: Verify required web files
         run: |
@@ -56,10 +62,28 @@ jobs:
           test -f build/web/index.pck
           echo "Web export contains the expected Godot runtime files."
 
-      - name: Upload web build artifact
+      - name: Upload downloadable web build
         uses: actions/upload-artifact@v4
         with:
           name: cryptid-camp-web
           path: build/web
           if-no-files-found: error
           retention-days: 14
+
+      - name: Upload GitHub Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy-pages:
+    if: github.event_name != 'pull_request'
+    needs: build-web
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

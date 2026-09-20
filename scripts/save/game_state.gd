@@ -28,6 +28,19 @@ func discover_species(species_id: String) -> void:
 func is_discovered(species_id: String) -> bool:
 	return species_id in state.get("discovered_species", [])
 
+func get_lure_objects() -> Array[String]:
+	var result: Array[String] = []
+	var lure: Dictionary = state.get("lure_site", {})
+	for object_id in lure.get("placed_objects", []):
+		result.append(str(object_id))
+	return result
+
+func set_lure_objects(objects: Array[String]) -> void:
+	var lure: Dictionary = state.get("lure_site", {})
+	lure["placed_objects"] = objects.duplicate()
+	state["lure_site"] = lure
+	persist()
+
 func get_wild_individual(species_id: String) -> Dictionary:
 	for cryptid in state.get("cryptids", []):
 		if cryptid.get("species") == species_id and not cryptid.get("adopted", false):
@@ -54,6 +67,14 @@ func change_trust(cryptid_id: String, amount: int) -> Dictionary:
 	for cryptid in state.get("cryptids", []):
 		if cryptid.get("id") == cryptid_id:
 			cryptid["trust"] = clampi(int(cryptid.get("trust", 0)) + amount, 0, 100)
+			persist()
+			return cryptid
+	return {}
+
+func set_trust(cryptid_id: String, value: int) -> Dictionary:
+	for cryptid in state.get("cryptids", []):
+		if cryptid.get("id") == cryptid_id:
+			cryptid["trust"] = clampi(value, 0, 100)
 			persist()
 			return cryptid
 	return {}

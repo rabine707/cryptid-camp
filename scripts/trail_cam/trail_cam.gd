@@ -7,6 +7,9 @@ extends Control
 var encounter_unlocked := false
 
 func _ready() -> void:
+	CampStyle.button(return_button, "green")
+	CampStyle.parchment($Margin/VBox/Preview)
+	$Margin/VBox/Preview/PreviewText.add_theme_color_override("font_color", CampStyle.INK)
 	return_button.pressed.connect(_primary_action)
 	_process_evidence()
 	_render_events()

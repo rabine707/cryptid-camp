@@ -1,0 +1,31 @@
+name: Godot Validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Godot
+        uses: lihop/setup-godot@v3
+        with:
+          version: 4.3-stable
+          mono: false
+          cache: true
+
+      - name: Import project
+        run: godot --headless --path . --import --quit
+
+      - name: Parse project and boot main scene
+        run: godot --headless --path . --quit-after 3
+
+      - name: Run simulation smoke test
+        run: godot --headless --path . --script res://tests/smoke_test.gd

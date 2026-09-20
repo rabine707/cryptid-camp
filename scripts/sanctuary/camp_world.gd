@@ -3,10 +3,17 @@ extends Control
 ## world; the parent can resize without changing routes or interaction targets.
 signal lamp_reached
 signal inspected(message: String)
+signal plot_selected(plot: String)
+signal decoration_enjoyed(item: String)
+signal activity_changed(activity: String)
+
+const Catalog = preload("res://scripts/sanctuary/decor_catalog.gd")
+const DecorationArt = preload("res://scripts/sanctuary/decoration_art.gd")
 
 const WORLD_SIZE := Vector2(360, 380)
-const POINTS := [Vector2(171, 161), Vector2(183, 204), Vector2(139, 251), Vector2(207, 264), Vector2(258, 211), Vector2(213, 316)]
-const LINKS := [[1], [0, 2, 3, 4], [1, 3], [1, 2, 5], [1], [3]]
+const POINTS := [Vector2(171, 161), Vector2(183, 204), Vector2(139, 251), Vector2(207, 264), Vector2(258, 211), Vector2(213, 316), Vector2(106, 276), Vector2(81, 311), Vector2(133, 326)]
+const LINKS := [[1], [0, 2, 3, 4], [1, 3, 6], [1, 2, 5], [1], [3], [2, 7, 8], [6], [6]]
+const PLOT_POINTS := {"garden_left": 7, "garden_right": 8}
 const TREES := [Vector3(19, 82, 1.05), Vector3(53, 60, 0.95), Vector3(294, 67, 1.1), Vector3(330, 96, 1.25), Vector3(16, 153, 1.15), Vector3(343, 174, 1.1), Vector3(20, 251, 1.0), Vector3(332, 282, 1.2), Vector3(38, 345, 1.15), Vector3(315, 365, 1.2), Vector3(12, 386, 1.25)]
 var resident: Dictionary = {}
 var lamp_placed := false
@@ -22,6 +29,14 @@ var textures: Dictionary = {}
 var ripple := -1.0
 var greeting := 0.0
 var moving := false
+var plots: Dictionary = {}
+var requested_plot := ""
+var active_plot := ""
+var reaction_time := 0.0
+var reaction_recorded := false
+var celebration := 0.0
+var selected_plot := ""
+var activity := "Making themself at home"
 
 func _ready() -> void:
 	clip_contents = true
@@ -29,10 +44,13 @@ func _ready() -> void:
 	rng.randomize()
 	for slot in ["background.sanctuary", "scenery.sanctuary.cabin", "scenery.sanctuary.pine", "scenery.sanctuary.pond", "scenery.sanctuary.campfire", "decoration.old_lamp"]:
 		textures[slot] = ArtRegistry.texture_for(slot)
+	for item in Catalog.ITEMS:
+		textures["decoration." + item] = ArtRegistry.texture_for("decoration." + item)
 
-func configure(individual: Dictionary, placed: bool) -> void:
+func configure(individual: Dictionary, placed: bool, saved_plots: Dictionary = {}) -> void:
 	resident = individual
 	lamp_placed = placed
+	plots = Catalog.clean_plots(saved_plots)
 	var variant := str(resident.get("variant", "classic"))
 	textures["resident"] = ArtRegistry.texture_for("cryptid.mothling." + variant)
 	if textures["resident"] == null:
@@ -48,12 +66,46 @@ func visit_lamp() -> void:
 	if resident.is_empty():
 		return
 	lamp_placed = true
+	_cancel_decoration()
 	lamp_requested = true
 	waiting = 0.0
 	# Finish the current edge first, then take a shortest walkable route.
 	# A repeat press replaces the route rather than starting a second animation.
 	route = _path(destination, 2)
+	_set_activity("Heading to the warm light")
 	queue_redraw()
+
+func set_plots(saved_plots: Dictionary) -> void:
+	plots = Catalog.clean_plots(saved_plots)
+	lamp_requested = false
+	resting_at_lamp = false
+	# Replacing or removing furniture cancels the old reaction immediately.
+	_cancel_decoration()
+	route.clear()
+	waiting = 0.0
+	queue_redraw()
+
+func _cancel_decoration() -> void:
+	requested_plot = ""
+	active_plot = ""
+	reaction_time = 0.0
+	reaction_recorded = false
+	_set_activity("Exploring the clearing")
+
+func visit_plot(plot: String) -> void:
+	if resident.is_empty() or not plots.has(plot): return
+	_cancel_decoration()
+	lamp_requested = false
+	resting_at_lamp = false
+	requested_plot = plot
+	waiting = 0.0
+	route = _path(destination, int(PLOT_POINTS[plot]))
+	_set_activity("Checking out the " + str(Catalog.ITEMS[plots[plot]].name).to_lower())
+
+func _set_activity(value: String) -> void:
+	if activity == value: return
+	activity = value
+	activity_changed.emit(value)
 
 func _path(start: int, finish: int) -> Array[int]:
 	var frontier: Array[int] = [start]
@@ -76,6 +128,7 @@ func _path(start: int, finish: int) -> Array[int]:
 func _process(delta: float) -> void:
 	elapsed += delta
 	greeting = maxf(0.0, greeting - delta)
+	celebration = maxf(0.0, celebration - delta)
 	if ripple >= 0.0:
 		ripple += delta
 		if ripple > 2.0:
@@ -86,23 +139,46 @@ func _process(delta: float) -> void:
 			moving = true
 			resting_at_lamp = false
 			creature_position = creature_position.move_toward(POINTS[destination], 22.0 * delta)
+			if creature_position.distance_to(POINTS[destination]) <= 0.5:
+				creature_position = POINTS[destination]
 		elif not route.is_empty():
 			destination = route.pop_front()
 		elif lamp_requested:
 			lamp_requested = false
 			resting_at_lamp = true
 			waiting = 7.0
+			_set_activity("Basking in the warm glow")
 			lamp_reached.emit()
+		elif not requested_plot.is_empty():
+			active_plot = requested_plot
+			requested_plot = ""
+			reaction_time = 0.0
+			reaction_recorded = false
+			_set_activity(str(Catalog.ITEMS[plots[active_plot]].action))
+		elif not active_plot.is_empty():
+			reaction_time += delta
+			if reaction_time >= 3.0 and not reaction_recorded:
+				reaction_recorded = true
+				decoration_enjoyed.emit(str(plots[active_plot]))
+			if reaction_time >= 9.0:
+				_cancel_decoration()
+				waiting = 0.0
+				destination = 6
 		elif waiting > 0.0:
 			waiting -= delta
 		else:
-			if lamp_placed and destination != 2 and rng.randf() < 0.35:
-				route = _path(destination, 2)
-				lamp_requested = true
+			if not plots.is_empty() and rng.randf() < 0.55:
+				var choices: Array = plots.keys()
+				visit_plot(str(choices[rng.randi_range(0, choices.size() - 1)]))
+			elif lamp_placed and destination != 2 and rng.randf() < 0.35:
+				visit_lamp()
 			else:
-				var neighbors: Array = LINKS[destination]
+				# Furniture endpoints are approached through visit_plot, so a
+				# random walk never stands inside furniture without reacting.
+				var neighbors: Array = LINKS[destination].filter(func(index: int) -> bool: return index < 7)
 				destination = int(neighbors[rng.randi_range(0, neighbors.size() - 1)])
 				waiting = rng.randf_range(2.0, 4.5)
+				_set_activity("Exploring the clearing")
 	queue_redraw()
 
 func _gui_input(event: InputEvent) -> void:
@@ -112,6 +188,12 @@ func _gui_input(event: InputEvent) -> void:
 	if not tapped:
 		return
 	var point: Vector2 = event.position * WORLD_SIZE / size
+	# Plot selection wins while decorating, even if Beans is sitting on it.
+	for plot in Catalog.PLOTS:
+		if point.distance_to(POINTS[PLOT_POINTS[plot]]) < 23.0:
+			plot_selected.emit(plot)
+			accept_event()
+			return
 	if not resident.is_empty() and point.distance_to(creature_position - Vector2(0, 15)) < 24.0:
 		greeting = 2.5
 		inspected.emit("%s gives a happy little flutter." % resident.get("name", "Your Mothling"))
@@ -126,8 +208,6 @@ func _gui_input(event: InputEvent) -> void:
 			inspected.emit("A familiar light calls your Mothling over.")
 		else:
 			inspected.emit("LANTERN NOOK\nThe perfect place for an Old Lamp.")
-	elif Rect2(59, 289, 90, 47).has_point(point):
-		inspected.emit("ROOM TO GROW\nTwo garden plots, saved for future decorations.")
 	elif Rect2(70, 57, 128, 96).has_point(point):
 		inspected.emit("CAMP CABIN\nA warm window. A place to come back to.")
 	else:
@@ -160,6 +240,8 @@ func _draw() -> void:
 	# Props and resident share foot-based depth ordering; replacement textures
 	# keep the same baseline and never change paths or gameplay state.
 	var props: Array[Dictionary] = [{"kind": "cabin", "y": 147.0}, {"kind": "pond", "y": 178.0}, {"kind": "fire", "y": 251.0}, {"kind": "lamp", "y": 246.0}]
+	for plot in Catalog.PLOTS:
+		props.append({"kind": "decoration", "y": POINTS[PLOT_POINTS[plot]].y, "plot": plot})
 	for tree in TREES:
 		props.append({"kind": "tree", "y": tree.y, "tree": tree})
 	if not resident.is_empty():
@@ -173,12 +255,34 @@ func _draw() -> void:
 			"lamp": _lamp()
 			"tree": _tree(prop.tree)
 			"resident": _creature()
+			"decoration": _decoration(prop.plot)
 	# Quiet fireflies drift only at the edge of the clearing.
 	for i in range(9):
 		var phase := elapsed * 0.6 + i * 2.3
 		var p := Vector2(42 + fmod(i * 67.0, 278.0), 65 + fmod(i * 43.0, 275.0)) + Vector2(sin(phase) * 6, cos(phase * 0.8) * 5)
 		draw_circle(p, 1.3, Color(0.91, 0.91, 0.56, 0.22 + 0.45 * (sin(phase) * 0.5 + 0.5)))
+	if celebration > 0:
+		for i in range(12):
+			var a := TAU * i / 12.0
+			var p := creature_position - Vector2(0, 20) + Vector2(cos(a), sin(a)) * (46 - celebration * 9)
+			draw_circle(p, 1.5, Color(1, 0.86, 0.58, celebration / 3.0))
 	draw_set_transform(Vector2.ZERO)
+
+func _decoration(plot: String) -> void:
+	var p: Vector2 = POINTS[PLOT_POINTS[plot]]
+	if selected_plot == plot:
+		_ellipse(p, Vector2(26, 17), Color(0.93, 0.84, 0.55, 0.2))
+	if not plots.has(plot):
+		_ellipse(p, Vector2(20, 12), Color("756d4c"))
+		for i in range(10):
+			var a := TAU * i / 10.0
+			draw_circle(p + Vector2(cos(a) * 19, sin(a) * 11), 2, Color("a4a582"))
+		draw_line(p - Vector2(4, 0), p + Vector2(4, 0), Color("e6d4a1"), 2, true)
+		draw_line(p - Vector2(0, 4), p + Vector2(0, 4), Color("e6d4a1"), 2, true)
+		return
+	var item := str(plots[plot])
+	if not _sprite("decoration." + item, Rect2(p - Vector2(32, 48), Vector2(64, 64))):
+		DecorationArt.paint(self, item, p, elapsed)
 
 func _ground() -> void:
 	_ellipse(Vector2(184, 235), Vector2(153, 164), Color("355745"))
@@ -207,15 +311,9 @@ func _ground() -> void:
 		for offset in [Vector2.ZERO, Vector2(8, 5), Vector2(-7, 7)]:
 			draw_line(p + offset, p + offset + Vector2(0, -5), Color("a6b67e"), 1, true)
 			draw_circle(p + offset + Vector2(0, -6), 2, Color("e0c789"))
-	for x in [81, 123]:
-		var p := Vector2(x, 311)
-		_ellipse(p, Vector2(18, 12), Color("2b4535"))
-		_ellipse(p - Vector2(0, 2), Vector2(16, 10), Color("756d4c"))
-		for i in range(8):
-			var a := TAU * i / 8.0
-			draw_circle(p + Vector2(cos(a) * 16, sin(a) * 10), 2.1, Color("a4a582"))
-		draw_line(p + Vector2(-4, -2), p + Vector2(4, -2), Color("c5c09a"), 1.5, true)
-		draw_line(p + Vector2(0, -6), p + Vector2(0, 2), Color("c5c09a"), 1.5, true)
+	# Small stepping stones connect the new decoration corners.
+	for p in [Vector2(111, 266), Vector2(100, 282), Vector2(92, 296), Vector2(118, 300), Vector2(126, 314)]:
+		_ellipse(p, Vector2(5, 3), Color("a9aa84"))
 	# Low fence and entrance posts frame the foreground without closing the path.
 	for x in [69, 99, 129, 248, 278]:
 		draw_line(Vector2(x, 365), Vector2(x + 30, 370), Color("827c57"), 4, true)
@@ -326,6 +424,12 @@ func _lamp() -> void:
 
 func _creature() -> void:
 	var p := creature_position
+	var enjoying := str(plots.get(active_plot, "")) if not active_plot.is_empty() else ""
+	var sleeping := enjoying == "moss_cushion"
+	if enjoying == "mushroom_stool": p.y -= 22
+	if sleeping: p.y -= 3
+	if enjoying == "wind_chimes": p.x += sin(elapsed * 2.0) * 4
+	if enjoying == "flower_patch": p.y += sin(elapsed * 3) * 2
 	_ellipse(p + Vector2(1, 2), Vector2(14, 5), Color(0.08, 0.18, 0.14, 0.38))
 	var bob := sin(elapsed * (8.0 if moving else 2.2)) * (2.0 if moving else 0.7)
 	p.y += bob
@@ -334,7 +438,7 @@ func _creature() -> void:
 		var variant := str(resident.get("variant", "classic"))
 		if variant == "autumn": wing = Color("cb9469")
 		if variant == "luna": wing = Color("adcaa9")
-		var flutter := sin(elapsed * (10.0 if moving or greeting > 0 else 2.5)) * 2
+		var flutter := -4.0 if sleeping else sin(elapsed * (10.0 if moving or greeting > 0 else 2.5)) * 2
 		_ellipse(p + Vector2(-11, -17), Vector2(10 + flutter, 15), wing)
 		_ellipse(p + Vector2(11, -17), Vector2(10 + flutter, 15), wing)
 		_ellipse(p + Vector2(-12, -15), Vector2(5, 8), wing.darkened(0.2))
@@ -342,7 +446,7 @@ func _creature() -> void:
 		_ellipse(p + Vector2(0, -17), Vector2(9, 14), Color("ede0be"))
 		draw_line(p + Vector2(-4, -27), p + Vector2(-9, -36), Color("e5d3ad"), 2, true)
 		draw_line(p + Vector2(4, -27), p + Vector2(9, -36), Color("e5d3ad"), 2, true)
-		var blink := fmod(elapsed, 5.8) > 5.6
+		var blink := sleeping or fmod(elapsed, 5.8) > 5.6
 		for x in [-4, 4]:
 			if blink:
 				draw_line(p + Vector2(x - 2, -20), p + Vector2(x + 2, -20), Color("683f3b"), 2, true)
@@ -350,6 +454,16 @@ func _creature() -> void:
 				draw_circle(p + Vector2(x, -20), 2.7, Color("9c5148"))
 				draw_circle(p + Vector2(x - 0.6, -21), 0.8, Color("fff2cf"))
 		draw_arc(p + Vector2(0, -15), 2.5, 0.1, PI - 0.1, 10, Color("765c48"), 1, true)
+	if sleeping:
+		draw_string(ThemeDB.fallback_font, p + Vector2(10, -40 - sin(elapsed) * 2), "z Z", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("d9e5b6"))
+	elif enjoying == "star_blanket":
+		var star := p + Vector2(8 + sin(elapsed) * 9, -49)
+		draw_line(star - Vector2(4, 0), star + Vector2(4, 0), Color("f3d99c"), 2, true)
+		draw_line(star - Vector2(0, 4), star + Vector2(0, 4), Color("f3d99c"), 2, true)
+	elif enjoying == "flower_patch":
+		var butterfly := p + Vector2(sin(elapsed * 1.5) * 13, -42 + cos(elapsed * 2) * 4)
+		_ellipse(butterfly - Vector2(3, 0), Vector2(3, 2 + sin(elapsed * 8)), Color("e5c882"))
+		_ellipse(butterfly + Vector2(3, 0), Vector2(3, 2 + sin(elapsed * 8)), Color("e5c882"))
 	if resting_at_lamp or greeting > 0:
 		var h := p + Vector2(0, -48)
 		draw_circle(h + Vector2(-2, 0), 3, Color("e9b68d"))

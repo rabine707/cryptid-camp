@@ -111,3 +111,22 @@ func unlock_moment(moment_id: String) -> void:
 
 func has_moment(moment_id: String) -> bool:
 	return moment_id in state.get("moments", [])
+
+func get_sanctuary_plots() -> Dictionary:
+	return preload("res://scripts/sanctuary/decor_catalog.gd").clean_plots(state.get("sanctuary_plots", {}))
+
+func set_sanctuary_plot(plot: String, item: String) -> bool:
+	var catalog = preload("res://scripts/sanctuary/decor_catalog.gd")
+	if plot not in catalog.PLOTS or (not item.is_empty() and not catalog.ITEMS.has(item)):
+		return false
+	var before: Dictionary = state.duplicate(true)
+	var plots := get_sanctuary_plots()
+	if item.is_empty():
+		plots.erase(plot)
+	else:
+		plots[plot] = item
+	state["sanctuary_plots"] = plots
+	if not SaveManager.save(state):
+		state = before
+		return false
+	return true

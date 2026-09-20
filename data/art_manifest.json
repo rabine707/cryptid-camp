@@ -17,6 +17,11 @@
     "scenery.sanctuary.pine": "res://art/sanctuary/pine.png",
     "scenery.sanctuary.pond": "res://art/sanctuary/pond.png",
     "scenery.sanctuary.campfire": "res://art/sanctuary/campfire.png",
-    "decoration.old_lamp": "res://art/sanctuary/old_lamp.png"
+    "decoration.old_lamp": "res://art/sanctuary/old_lamp.png",
+    "decoration.mushroom_stool": "res://art/sanctuary/mushroom_stool.png",
+    "decoration.flower_patch": "res://art/sanctuary/flower_patch.png",
+    "decoration.moss_cushion": "res://art/sanctuary/moss_cushion.png",
+    "decoration.wind_chimes": "res://art/sanctuary/wind_chimes.png",
+    "decoration.star_blanket": "res://art/sanctuary/star_blanket.png"
   }
 }

@@ -28,7 +28,20 @@ Prototype visuals are deliberately replaceable. Gameplay references semantic art
 ## Sanctuary campground
 
 Sanctuary now has a vector campground with a lit cabin, paths, perimeter pines,
-pond, campfire, future garden plots and a wandering Mothling. Tap world details
+pond, campfire, two decoration corners and a wandering Mothling. Tap world details
 or visit the Old Lamp. Warm Glow unlocks on arrival and survives returning to
 camp. Existing resident saves require no reset. See
 `docs/SANCTUARY_VALIDATION.md` for isolated tests and portrait capture instructions.
+
+### Make it yours
+
+Open **Decorate camp** or tap a garden corner. Choose from five free items:
+Mushroom Stool, Flower Patch, Moss Cushion, Wind Chimes and Stargazer Blanket.
+Place, replace or clear either corner; changes save immediately. Your resident
+walks over to investigate, then continues to visit decorations independently.
+Each item has its own reaction and discoverable moment. Open **Moments** to see
+all six memories (including Warm Glow) and hints for those still undiscovered.
+
+Decorating is available before adoption too, but a resident must actually enjoy
+an item before its moment is discovered. No currency, waiting timers or purchases
+are required. The resident, trust, lamp and existing save data remain unchanged.

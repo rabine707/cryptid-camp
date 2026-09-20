@@ -48,7 +48,7 @@ preserved aspect ratio; missing files safely retain vector placeholders.
 
 | Manifest slot | Logical artwork box | Notes |
 | --- | --- | --- |
-| background.sanctuary | 360 x 380 | Ground, paths, garden plots and fence only; leave dynamic props out. |
+| background.sanctuary | 360 x 380 | Ground, paths and fence only; leave dynamic props and decoration plots out. |
 | scenery.sanctuary.cabin | 140 x 109 | Transparent canvas; bottom edge at the cabin steps. |
 | scenery.sanctuary.pine | 56 x 83 | Transparent tree; trunk near bottom, reused at varying scales. |
 | scenery.sanctuary.pond | 87 x 65 | Water, bank, reeds and pads. |
@@ -63,5 +63,17 @@ sprites are static textures with procedural bobbing; a future animated sprite
 can be connected at `_creature()` without changing the movement controller.
 Background replacement does not include dynamic trees, cabin, pond, fire or lamp.
 
-The two marked garden plots reserve future decoration space; they do not imply
-an inventory or placement system beyond the existing Old Lamp milestone.
+The two garden plots now accept five free decorations. `decor_catalog.gd` owns
+stable item/moment IDs and copy; `decoration_art.gd` shares each vector drawing
+between the world and the picker. Replace `decoration.mushroom_stool`,
+`decoration.flower_patch`, `decoration.moss_cushion`, `decoration.wind_chimes` or
+`decoration.star_blanket` through the manifest. Each uses a transparent 64 x 64
+logical canvas with its ground contact at (32, 48); export at least 192 x 192.
+Preserve transparent padding because the picker and world use the same asset.
+The resident's perch offset is 22 logical units above the Mushroom Stool's base.
+The old lamp remains its own permanent decoration and interaction.
+
+The world emits `decoration_enjoyed` after three seconds at a placed item;
+the Sanctuary controller alone records its moment. Replacing/removing furniture
+cancels unfinished reactions. Animation state is transient, plot assignments
+and discovered moments are saved. Human-made textures change no save contracts.

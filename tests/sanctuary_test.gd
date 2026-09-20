@@ -98,7 +98,9 @@ func _run() -> void:
 	_tap(Vector2(284, 151))
 	_check(scene.moment.text.contains("STILLWATER"), "pond interaction responds")
 	_tap(Vector2(81, 311))
-	_check(scene.moment.text.contains("ROOM TO GROW"), "garden plot interaction responds")
+	_check(is_instance_valid(scene.sheet) and scene.sheet.current_plot == "garden_left", "garden plot opens the decoration picker")
+	scene._close_sheet()
+	scene.world.set_process(false)
 	_tap(scene.world.creature_position - Vector2(0, 15))
 	_check(scene.world.greeting > 0, "resident responds to touch")
 	var explored := false

@@ -3,24 +3,10 @@ extends Control
 const OBJECTS_PATH := "res://data/lure_objects.json"
 const CRYPTIDS_PATH := "res://data/cryptids.json"
 const MAX_OBJECTS := 6
-
-const STARTER_OBJECTS := [
-	"pine_tree",
-	"berry_bush",
-	"hollow_log",
-	"lantern",
-	"old_radio",
-	"camping_chair"
-]
-
+const STARTER_OBJECTS := ["pine_tree", "berry_bush", "hollow_log", "lantern", "old_radio", "camping_chair"]
 const ICONS := {
-	"pine_tree": "🌲",
-	"berry_bush": "🫐",
-	"hollow_log": "🪵",
-	"lantern": "🏮",
-	"old_radio": "📻",
-	"camping_chair": "🪑",
-	"trail_camera": "📷"
+	"pine_tree": "🌲", "berry_bush": "🫐", "hollow_log": "🪵",
+	"lantern": "🏮", "old_radio": "📻", "camping_chair": "🪑", "trail_camera": "📷"
 }
 
 var object_defs: Dictionary = {}
@@ -37,6 +23,7 @@ func _ready() -> void:
 	rng.randomize()
 	object_defs = _load_json(OBJECTS_PATH)
 	cryptid_defs = _load_json(CRYPTIDS_PATH)
+	placed_objects = GameState.get_lure_objects()
 	$Margin/VBox/Header/Back.pressed.connect(_go_back)
 	observe_button.pressed.connect(_begin_observation)
 	CampStyle.button($Margin/VBox/Header/Back, "wood")
@@ -78,12 +65,14 @@ func _place_object(object_id: String) -> void:
 		status.text = "The clearing is full. Tap an object above to pack it up."
 		return
 	placed_objects.append(object_id)
+	GameState.set_lure_objects(placed_objects)
 	_refresh()
 
 func _remove_from_slot(index: int) -> void:
 	if index >= placed_objects.size():
 		return
 	placed_objects.remove_at(index)
+	GameState.set_lure_objects(placed_objects)
 	_refresh()
 
 func _refresh() -> void:
@@ -98,17 +87,12 @@ func _refresh() -> void:
 	if placed_objects.is_empty():
 		status.text = "Place a few things and see what notices."
 	else:
-		status.text = "%d / %d objects placed. Tap a placed object to remove it." % [placed_objects.size(), MAX_OBJECTS]
+		status.text = "%d / %d objects placed. Your clearing stays deployed between visits." % [placed_objects.size(), MAX_OBJECTS]
 
 func _begin_observation() -> void:
 	var scores: Dictionary = {}
 	for cryptid_id in cryptid_defs:
-		scores[cryptid_id] = Attraction.score(
-			cryptid_defs[cryptid_id],
-			placed_objects,
-			object_defs,
-			{"is_night": true}
-		)
+		scores[cryptid_id] = Attraction.score(cryptid_defs[cryptid_id], placed_objects, object_defs, {"is_night": true})
 	var visitor := Observation.choose_visitor(scores, rng)
 	var events := Observation.generate_events(visitor, rng)
 	TrailCamSession.events = events

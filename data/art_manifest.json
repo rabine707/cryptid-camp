@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "policy": "Prototype visuals are placeholders. Final public-facing art should be commissioned, licensed, or otherwise intentionally sourced.",
+  "slots": {
+    "background.main_menu": "res://art/backgrounds/main_menu.png",
+    "background.whispering_woods": "res://art/backgrounds/whispering_woods.png",
+    "background.sanctuary": "res://art/backgrounds/sanctuary.png",
+    "cryptid.mothling.classic": "res://art/cryptids/mothling/classic.png",
+    "cryptid.mothling.autumn": "res://art/cryptids/mothling/autumn.png",
+    "cryptid.mothling.luna": "res://art/cryptids/mothling/luna.png",
+    "trail_cam.mothling": "res://art/trail_cam/mothling.png",
+    "icon.lantern": "res://art/icons/lantern.png",
+    "icon.berry_bush": "res://art/icons/berry_bush.png",
+    "icon.hollow_log": "res://art/icons/hollow_log.png",
+    "icon.pine_tree": "res://art/icons/pine_tree.png"
+  }
+}

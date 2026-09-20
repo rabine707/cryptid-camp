@@ -6,6 +6,7 @@ extends Control
 var mothling: Dictionary = {}
 
 func _ready() -> void:
+	CampStyle.button($Margin/VBox/Invite, "green")
 	mothling = GameState.get_wild_individual("mothling")
 	if mothling.is_empty() or int(mothling.get("trust", 0)) < 80:
 		get_tree().change_scene_to_file("res://scenes/main/main.tscn")

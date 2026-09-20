@@ -57,3 +57,36 @@ func change_trust(cryptid_id: String, amount: int) -> Dictionary:
 			persist()
 			return cryptid
 	return {}
+
+func adopt_cryptid(cryptid_id: String, chosen_name: String) -> Dictionary:
+	for cryptid in state.get("cryptids", []):
+		if cryptid.get("id") == cryptid_id:
+			cryptid["name"] = chosen_name.strip_edges()
+			cryptid["adopted"] = true
+			cryptid["adopted_at"] = int(Time.get_unix_time_from_system())
+			persist()
+			return cryptid
+	return {}
+
+func get_adopted_species(species_id: String) -> Dictionary:
+	for cryptid in state.get("cryptids", []):
+		if cryptid.get("species") == species_id and cryptid.get("adopted", false):
+			return cryptid
+	return {}
+
+func place_sanctuary_decoration(decoration_id: String) -> void:
+	var decorations: Array = state.get("sanctuary_decorations", [])
+	if decoration_id not in decorations:
+		decorations.append(decoration_id)
+	state["sanctuary_decorations"] = decorations
+	persist()
+
+func unlock_moment(moment_id: String) -> void:
+	var moments: Array = state.get("moments", [])
+	if moment_id not in moments:
+		moments.append(moment_id)
+	state["moments"] = moments
+	persist()
+
+func has_moment(moment_id: String) -> bool:
+	return moment_id in state.get("moments", [])

@@ -10,6 +10,10 @@ var rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
 	rng.randomize()
+	CampStyle.button($Margin/VBox/Actions/Treat, "wood")
+	CampStyle.button($Margin/VBox/Actions/Observe, "wood")
+	CampStyle.button($Margin/VBox/Actions/Photo, "wood")
+	CampStyle.button($Margin/VBox/Leave, "green")
 	mothling = GameState.ensure_wild_individual("mothling", rng)
 	$Margin/VBox/Actions/Treat.pressed.connect(_treat)
 	$Margin/VBox/Actions/Observe.pressed.connect(_observe)

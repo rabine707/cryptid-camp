@@ -19,5 +19,6 @@ renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 
 [autoload]
+CampStyle="*res://scripts/ui/camp_style.gd"
 GameState="*res://scripts/save/game_state.gd"
 TrailCamSession="*res://scripts/simulation/trail_cam_session.gd"

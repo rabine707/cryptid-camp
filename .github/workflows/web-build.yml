@@ -1,0 +1,89 @@
+name: Build and Deploy Godot Web
+
+on:
+  push:
+    branches:
+      - main
+      - web-pwa-deployment
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-web:
+    runs-on: ubuntu-latest
+    env:
+      GODOT_VERSION: "4.3"
+      GODOT_STATUS: "stable"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y unzip
+
+      - name: Download Godot
+        run: |
+          curl -L -o /tmp/godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-${GODOT_STATUS}/Godot_v${GODOT_VERSION}-${GODOT_STATUS}_linux.x86_64.zip"
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          mv "/tmp/godot/Godot_v${GODOT_VERSION}-${GODOT_STATUS}_linux.x86_64" /tmp/godot/godot
+          chmod +x /tmp/godot/godot
+
+      - name: Install Godot export templates
+        run: |
+          curl -L -o /tmp/templates.tpz "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-${GODOT_STATUS}/Godot_v${GODOT_VERSION}-${GODOT_STATUS}_export_templates.tpz"
+          mkdir -p /tmp/templates
+          unzip -q /tmp/templates.tpz -d /tmp/templates
+          mkdir -p "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.${GODOT_STATUS}"
+          cp -R /tmp/templates/templates/. "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.${GODOT_STATUS}/"
+
+      - name: Import project assets
+        run: /tmp/godot/godot --headless --path . --editor --quit
+
+      - name: Export release web build
+        run: |
+          mkdir -p build/web
+          /tmp/godot/godot --headless --path . --export-release "Web" build/web/index.html
+          touch build/web/.nojekyll
+
+      - name: Verify required web files
+        run: |
+          test -f build/web/index.html
+          test -f build/web/index.wasm
+          test -f build/web/index.pck
+          echo "Web export contains the expected Godot runtime files."
+
+      - name: Upload downloadable web build
+        uses: actions/upload-artifact@v4
+        with:
+          name: cryptid-camp-web
+          path: build/web
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload GitHub Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy-pages:
+    if: github.event_name != 'pull_request'
+    needs: build-web
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

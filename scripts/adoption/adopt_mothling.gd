@@ -13,6 +13,27 @@ func _ready() -> void:
 		return
 	$Margin/VBox/Invite.pressed.connect(_welcome_home)
 	name_input.text_submitted.connect(_submit_name)
+	name_input.gui_input.connect(_on_name_input_gui_input)
+	name_input.focus_entered.connect(_show_mobile_keyboard)
+
+func _on_name_input_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed:
+		_show_mobile_keyboard()
+	elif event is InputEventScreenTouch and event.pressed:
+		_show_mobile_keyboard()
+
+func _show_mobile_keyboard() -> void:
+	name_input.grab_focus()
+	if OS.has_feature("web_ios") or OS.has_feature("web_android") or OS.has_feature("mobile"):
+		var rect := Rect2(name_input.global_position, name_input.size)
+		DisplayServer.virtual_keyboard_show(
+			name_input.text,
+			rect,
+			DisplayServer.KEYBOARD_TYPE_DEFAULT,
+			name_input.max_length,
+			name_input.caret_column,
+			name_input.caret_column
+		)
 
 func _submit_name(_value: String) -> void:
 	_welcome_home()
@@ -26,4 +47,5 @@ func _welcome_home() -> void:
 	if mothling.is_empty():
 		message.text = "Something went wrong. The Mothling is still waiting."
 		return
+	DisplayServer.virtual_keyboard_hide()
 	get_tree().change_scene_to_file("res://scenes/sanctuary/sanctuary.tscn")

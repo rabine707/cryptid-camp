@@ -38,8 +38,8 @@ theme_override_constants/separation = 26
 
 [node name="Moon" type="Label" parent="Margin/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 80
-text = "☾"
+theme_override_font_sizes/font_size = 32
+text = "NIGHTFALL"
 horizontal_alignment = 1
 
 [node name="Sign" type="PanelContainer" parent="Margin/VBox"]
@@ -61,19 +61,19 @@ custom_minimum_size = Vector2(0,180)
 layout_mode = 2
 
 [node name="WhisperingWoods" type="Button" parent="Margin/VBox"]
-custom_minimum_size = Vector2(0,110)
+custom_minimum_size = Vector2(0,150)
 layout_mode = 2
-text = "🌲  Whispering Woods"
+text = "Whispering Woods"
 
 [node name="Sanctuary" type="Button" parent="Margin/VBox"]
-custom_minimum_size = Vector2(0,110)
+custom_minimum_size = Vector2(0,150)
 layout_mode = 2
-text = "🏕  Sanctuary"
+text = "Sanctuary"
 
 [node name="Journal" type="Button" parent="Margin/VBox"]
-custom_minimum_size = Vector2(0,95)
+custom_minimum_size = Vector2(0,150)
 layout_mode = 2
-text = "📖  Field Journal"
+text = "Field Journal"
 
 [node name="Version" type="Label" parent="Margin/VBox"]
 layout_mode = 2

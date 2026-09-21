@@ -4,10 +4,6 @@ const OBJECTS_PATH := "res://data/lure_objects.json"
 const CRYPTIDS_PATH := "res://data/cryptids.json"
 const MAX_OBJECTS := 6
 const STARTER_OBJECTS := ["pine_tree", "berry_bush", "hollow_log", "lantern", "old_radio", "camping_chair"]
-const ICONS := {
-	"pine_tree": "🌲", "berry_bush": "🫐", "hollow_log": "🪵",
-	"lantern": "🏮", "old_radio": "📻", "camping_chair": "🪑", "trail_camera": "📷"
-}
 
 var object_defs: Dictionary = {}
 var cryptid_defs: Dictionary = {}
@@ -32,6 +28,8 @@ func _ready() -> void:
 	_build_clearing()
 	_build_inventory()
 	_refresh()
+	if GameState.needs_first_hunt():
+		$Margin/VBox/Hint.text = "Your first visitor: place a Lantern, then watch the Trail Cam. Light draws curious creatures out of hiding."
 
 func _load_json(path: String) -> Dictionary:
 	var file := FileAccess.open(path, FileAccess.READ)
@@ -49,15 +47,19 @@ func _build_clearing() -> void:
 		slot.name = "Slot%d" % i
 		slot.pressed.connect(_remove_from_slot.bind(i))
 		CampStyle.button(slot, "paper")
+		slot.add_theme_font_size_override("font_size", 32)
 		clearing.add_child(slot)
 
 func _build_inventory() -> void:
 	for object_id in STARTER_OBJECTS:
 		var button := Button.new()
-		button.custom_minimum_size = Vector2(285, 92)
-		button.text = "%s  %s" % [ICONS.get(object_id, "•"), object_defs.get(object_id, {}).get("name", object_id)]
+		button.custom_minimum_size = Vector2(310, 150)
+		button.text = str(object_defs.get(object_id, {}).get("name", object_id))
 		button.pressed.connect(_place_object.bind(object_id))
 		CampStyle.button(button, "wood")
+		button.add_theme_font_size_override("font_size", 32)
+		if object_id == "lantern" and GameState.needs_first_hunt():
+			CampStyle.button(button, "green")
 		inventory.add_child(button)
 
 func _place_object(object_id: String) -> void:
@@ -80,7 +82,7 @@ func _refresh() -> void:
 		var slot := clearing.get_child(i) as Button
 		if i < placed_objects.size():
 			var id := placed_objects[i]
-			slot.text = "%s\n%s" % [ICONS.get(id, "•"), object_defs.get(id, {}).get("name", id)]
+			slot.text = str(object_defs.get(id, {}).get("name", id))
 		else:
 			slot.text = "+\nEmpty"
 	observe_button.disabled = placed_objects.is_empty()
@@ -88,12 +90,19 @@ func _refresh() -> void:
 		status.text = "Place a few things and see what notices."
 	else:
 		status.text = "%d / %d objects placed. Your clearing stays deployed between visits." % [placed_objects.size(), MAX_OBJECTS]
+	if GameState.needs_first_hunt():
+		observe_button.disabled = "lantern" not in placed_objects
+		status.text = "Lantern ready. Watch for movement on the Trail Cam." if "lantern" in placed_objects else "Tap Lantern in your Field Kit. If the clearing is full, tap a placed object to pack it up."
+		observe_button.text = "Watch the Trail Cam"
 
 func _begin_observation() -> void:
 	var scores: Dictionary = {}
 	for cryptid_id in cryptid_defs:
 		scores[cryptid_id] = Attraction.score(cryptid_defs[cryptid_id], placed_objects, object_defs, {"is_night": true})
 	var visitor := Observation.choose_visitor(scores, rng)
+	if GameState.needs_first_hunt():
+		visitor = "mothling"
+	GameState.begin_hunt()
 	var events := Observation.generate_events(visitor, rng)
 	TrailCamSession.events = events
 	TrailCamSession.visitor_id = visitor

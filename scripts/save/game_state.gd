@@ -8,6 +8,28 @@ func _ready() -> void:
 func persist() -> void:
 	SaveManager.save(state)
 
+func needs_first_hunt() -> bool:
+	# Legacy discoveries/residents already earned their progression.
+	return state.get("discovered_species", []).is_empty() and state.get("cryptids", []).is_empty()
+
+func begin_hunt() -> void:
+	# Missing fields in established saves skip onboarding without touching identity.
+	var fallback := 0 if needs_first_hunt() else 2
+	state["guided_hunts"] = 1 if needs_first_hunt() else int(state.get("guided_hunts", fallback)) + 1
+	persist()
+
+func has_second_hunt_hint() -> bool:
+	return not needs_first_hunt() and int(state.get("guided_hunts", 3)) == 2
+
+func evidence_for(species: String) -> Array:
+	return state.get("evidence", {}).get(species, [])
+
+func identify_species(species: String) -> bool:
+	if not FieldResearch.can_identify(species, evidence_for(species)):
+		return false
+	discover_species(species)
+	return true
+
 func add_evidence(species_id: String, evidence_id: String) -> int:
 	var evidence: Dictionary = state.get("evidence", {})
 	var species_evidence: Array = evidence.get(species_id, [])

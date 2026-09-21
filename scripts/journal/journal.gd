@@ -1,10 +1,21 @@
 extends Control
 
+var selected_species := "mothling"
+
 func _ready() -> void:
 	CampStyle.button($Margin/VBox/Header/Back, "wood")
 	CampStyle.parchment($Margin/VBox/Page)
 	_set_ink($Margin/VBox/Page/Content)
 	$Margin/VBox/Header/Back.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/main/main.tscn"))
+	var picker := OptionButton.new()
+	picker.custom_minimum_size.y = 120
+	CampStyle.button(picker, "wood")
+	picker.add_theme_font_size_override("font_size", 36)
+	for id in FieldResearch.NAMES:
+		picker.add_item(FieldResearch.NAMES[id] if GameState.is_discovered(id) else "Unknown / " + str(picker.item_count + 1))
+	picker.item_selected.connect(func(index: int): selected_species = FieldResearch.NAMES.keys()[index]; _render())
+	$Margin/VBox.add_child(picker)
+	$Margin/VBox.move_child(picker, 1)
 	_render()
 
 func _set_ink(node: Node) -> void:
@@ -14,16 +25,23 @@ func _set_ink(node: Node) -> void:
 		_set_ink(child)
 
 func _render() -> void:
-	var discovered := GameState.is_discovered("mothling")
-	var evidence: Array = GameState.state.get("evidence", {}).get("mothling", [])
-	var resident := GameState.get_adopted_species("mothling")
-	if discovered:
-		$Margin/VBox/Page/Content/Species.text = "MOTHLING"
-		$Margin/VBox/Page/Content/Sketch.text = "  ╱\\  ʚɞ  /╲\n     •ᴗ•"
-		$Margin/VBox/Page/Content/Status.text = "DISCOVERED"
-		$Margin/VBox/Page/Content/Notes.text = "Observed near artificial light after dark. Seems curious, cautious, and much fluffier than the rumors suggested.\n\nEvidence recorded: %d" % evidence.size()
-	elif evidence.size() > 0:
-		$Margin/VBox/Page/Content/Status.text = "DOCUMENTED"
-		$Margin/VBox/Page/Content/Notes.text = "Faint red eyes. Movement near the light. Something winged is visiting the clearing."
+	var discovered := GameState.is_discovered(selected_species)
+	var evidence := GameState.evidence_for(selected_species)
+	var resident := GameState.get_adopted_species(selected_species)
+	$Margin/VBox/Page/Content/Species.text = str(FieldResearch.NAMES[selected_species]).to_upper() if discovered else "UNKNOWN VISITOR"
+	$Margin/VBox/Page/Content/Sketch.visible = discovered and selected_species == "mothling"
+	$Margin/VBox/Page/Content/Status.text = "DISCOVERED" if discovered else ("DOCUMENTED" if not evidence.is_empty() else "RUMORED")
+	var notes := "No reliable notes yet. Place a lure in Whispering Woods and review your Trail Cam."
+	if not evidence.is_empty():
+		notes = "Evidence recorded: %d\n" % evidence.size()
+		for clue in evidence:
+			if FieldResearch.CLUES.has(clue):
+				notes += "\n- " + str(FieldResearch.CLUES[clue].label)
+	if discovered and selected_species == "mothling":
+		notes += "\n\nCurious, cautious, and much fluffier than the rumors suggested. Visit it to build trust, then invite it home at 80 trust."
+	elif discovered:
+		notes += "\n\nRecorded in your collection. This visitor's trust and adoption encounter is not available in this milestone."
+	$Margin/VBox/Page/Content/Notes.text = notes
+	$Margin/VBox/Page/Content/Resident.text = ""
 	if not resident.is_empty():
-		$Margin/VBox/Page/Content/Resident.text = "CAMP RESIDENT\n%s • %s • %s • %s" % [resident.get("name","Mothling"), str(resident.get("variant","classic")).capitalize(), resident.get("personality","Curious"), resident.get("quirk","Clingy")]
+		$Margin/VBox/Page/Content/Resident.text = "CAMP RESIDENT\n%s / %s / %s / %s" % [resident.get("name","Mothling"), str(resident.get("variant","classic")).capitalize(), resident.get("personality","Curious"), resident.get("quirk","Clingy")]

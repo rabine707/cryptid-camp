@@ -1,5 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 [ext_resource path="res://scripts/journal/journal.gd" type="Script" id="1"]
+[ext_resource path="res://scripts/cryptids/mothling_portrait.gd" type="Script" id="2"]
+
 [node name="Journal" type="Control"]
 layout_mode=3
 anchors_preset=15
@@ -31,7 +33,7 @@ theme_override_constants/separation=18
 [node name="Header" type="HBoxContainer" parent="Margin/VBox"]
 layout_mode=2
 [node name="Back" type="Button" parent="Margin/VBox/Header"]
-custom_minimum_size=Vector2(110,70)
+custom_minimum_size=Vector2(150,150)
 text="Camp"
 [node name="Title" type="Label" parent="Margin/VBox/Header"]
 layout_mode=2
@@ -50,20 +52,17 @@ theme_override_constants/separation=20
 [node name="Species" type="Label" parent="Margin/VBox/Page/Content"]
 theme_override_font_sizes/font_size=42
 text="UNKNOWN #001"
-[node name="Sketch" type="Label" parent="Margin/VBox/Page/Content"]
+[node name="Sketch" type="Control" parent="Margin/VBox/Page/Content"]
+script = ExtResource("2")
 custom_minimum_size=Vector2(0,380)
-theme_override_font_sizes/font_size=72
-text="?\n\n🔴     🔴"
-horizontal_alignment=1
-vertical_alignment=1
 [node name="Status" type="Label" parent="Margin/VBox/Page/Content"]
-theme_override_font_sizes/font_size=28
+theme_override_font_sizes/font_size=32
 text="RUMORED"
 [node name="Notes" type="Label" parent="Margin/VBox/Page/Content"]
-theme_override_font_sizes/font_size=25
+theme_override_font_sizes/font_size=32
 autowrap_mode=2
 text="No reliable notes yet."
 [node name="Resident" type="Label" parent="Margin/VBox/Page/Content"]
-theme_override_font_sizes/font_size=25
+theme_override_font_sizes/font_size=32
 autowrap_mode=2
 text=""

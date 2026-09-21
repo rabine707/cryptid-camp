@@ -55,6 +55,15 @@ jobs:
           /tmp/godot/godot --headless --path . --export-release "Web" build/web/index.html
           touch build/web/.nojekyll
 
+      - name: Validate guided hunt and save compatibility
+        env:
+          XDG_DATA_HOME: /tmp/cryptid-camp-tests
+        run: |
+          /tmp/godot/godot --headless --path . --script res://tests/smoke_test.gd
+          /tmp/godot/godot --headless --path . --script res://tests/first_hunt_test.gd
+          /tmp/godot/godot --headless --path . --script res://tests/sanctuary_test.gd
+          /tmp/godot/godot --headless --path . --script res://tests/decorating_test.gd
+
       - name: Verify required web files
         run: |
           test -f build/web/index.html

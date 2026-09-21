@@ -22,8 +22,13 @@ func _ready() -> void:
 	$Margin/VBox/Actions/Photo.pressed.connect(_photo)
 	$Margin/VBox/Leave.pressed.connect(_leave)
 	dev_button.pressed.connect(_dev_add_trust)
+	dev_button.visible = OS.has_feature("editor")
+	for control in [$Margin/VBox/Actions/Treat, $Margin/VBox/Actions/Observe, $Margin/VBox/Actions/Photo, $Margin/VBox/Leave]:
+		control.add_theme_font_size_override("font_size", 32)
 	_render()
 	message.text = _arrival_message()
+	if int(mothling.get("encounter_count", 1)) == 1:
+		message.text = "Discovery is just the beginning. Offer a treat or observe quietly to build trust. At 80 trust, invite your new friend to the Sanctuary."
 
 func _render() -> void:
 	var variant := str(mothling.get("variant", "classic")).capitalize()
@@ -83,7 +88,7 @@ func _apply_action(amount: int, text: String) -> void:
 	var new_stage := CryptidFactory.trust_stage(int(mothling.get("trust", 0)))
 	message.text = text
 	if new_stage != old_stage:
-		message.text += "\n\n♡ Trust grew: %s" % new_stage
+		message.text += "\n\nTrust grew: %s" % new_stage
 	_render()
 
 func _dev_add_trust() -> void:

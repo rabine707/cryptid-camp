@@ -35,8 +35,10 @@ An artist should be able to replace an asset at the manifest path, import it in 
 
 ## Sanctuary campground placeholders
 
-The Sanctuary uses only Godot vector drawing and UI, with no generated bitmap
-art or external art service. `scripts/sanctuary/camp_world.gd` owns presentation
+The Sanctuary uses Godot vector scenery and UI with replaceable resident art.
+The illustrated art pass supplies a generated Mothling PNG; there is no runtime
+art service. See `ILLUSTRATED_ART.md` for asset provenance and prompts.
+`scripts/sanctuary/camp_world.gd` owns presentation
 and one waypoint movement controller. `scripts/sanctuary/sanctuary.gd` owns UI
 and calls the existing GameState save methods. The save format is unchanged.
 

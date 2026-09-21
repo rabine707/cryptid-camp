@@ -1,10 +1,17 @@
 extends Control
 ## A font-independent field sketch for encounter, journal and adoption screens.
+var texture: Texture2D
+
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	texture = ArtRegistry.texture_for("cryptid.mothling.classic")
 	resized.connect(queue_redraw)
 
 func _draw() -> void:
+	if texture != null:
+		var fitted := texture.get_size() * minf(size.x / texture.get_width(), size.y / texture.get_height())
+		draw_texture_rect(texture, Rect2((size - fitted) / 2, fitted), false)
+		return
 	var unit := minf(size.x / 500.0, size.y / 380.0)
 	draw_set_transform(size / 2, 0, Vector2.ONE * unit)
 	for side in [-1, 1]:

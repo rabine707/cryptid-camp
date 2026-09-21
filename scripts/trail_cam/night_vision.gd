@@ -4,10 +4,12 @@ var visitor := "mothling"
 var reveal := false
 var elapsed := 0.0
 var tick := 0.0
+var forest: Texture2D
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	clip_contents = true
+	forest = ArtRegistry.texture_for("background.whispering_woods")
 
 func _process(delta: float) -> void:
 	elapsed += delta
@@ -35,6 +37,8 @@ func _draw() -> void:
 			var top := y + branch * height * 0.18
 			var width := 35.0 + branch * 16
 			draw_colored_polygon(PackedVector2Array([Vector2(x, top - 55), Vector2(x - width, top + 95), Vector2(x + width, top + 90)]), shade)
+	if forest != null:
+		draw_texture_rect(forest, Rect2(0, 0, 960, 620), false, Color(0.18, 0.48, 0.17))
 	for i in range(8):
 		draw_line(Vector2(0, 460 + i * 17), Vector2(960, 435 + i * 24), Color(0.2, 0.34, 0.21, 0.045), 16)
 	var body := Color("334a32") if reveal else Color("0b1b12")

@@ -25,6 +25,15 @@ func _ready() -> void:
 	CampStyle.button($Margin/VBox/Header/Back, "wood")
 	CampStyle.button(observe_button, "green")
 	CampStyle.parchment($Margin/VBox/ClearingPanel)
+	var clearing_panel := $Margin/VBox/ClearingPanel
+	clearing_panel.add_theme_stylebox_override("panel", CampStyle.panel(Color("10251e"), 18, 3, Color("647252")))
+	var landscape := TextureRect.new()
+	landscape.texture = ArtRegistry.texture_for("background.whispering_woods")
+	landscape.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	landscape.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	landscape.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	clearing_panel.add_child(landscape)
+	clearing_panel.move_child(landscape, 0)
 	_build_clearing()
 	_build_inventory()
 	_refresh()
@@ -47,6 +56,8 @@ func _build_clearing() -> void:
 		slot.name = "Slot%d" % i
 		slot.pressed.connect(_remove_from_slot.bind(i))
 		CampStyle.button(slot, "paper")
+		slot.add_theme_stylebox_override("normal", CampStyle.panel(Color(0.025, 0.085, 0.065, 0.78), 14, 2, Color("869175")))
+		slot.add_theme_color_override("font_color", Color("f0e4c5"))
 		slot.add_theme_font_size_override("font_size", 32)
 		clearing.add_child(slot)
 

@@ -37,8 +37,7 @@ func _ready() -> void:
 	_build_clearing()
 	_build_inventory()
 	_refresh()
-	if GameState.needs_first_hunt():
-		$Margin/VBox/Hint.text = "Your first visitor: place a Lantern, then watch the Trail Cam. Light draws curious creatures out of hiding."
+	_refresh_guidance()
 
 func _load_json(path: String) -> Dictionary:
 	var file := FileAccess.open(path, FileAccess.READ)
@@ -65,7 +64,8 @@ func _build_inventory() -> void:
 	for object_id in STARTER_OBJECTS:
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(310, 150)
-		button.text = str(object_defs.get(object_id, {}).get("name", object_id))
+		var definition: Dictionary = object_defs.get(object_id, {})
+		button.text = "%s\n%s" % [definition.get("name", object_id), _tag_summary(definition.get("tags", {}))]
 		button.pressed.connect(_place_object.bind(object_id))
 		CampStyle.button(button, "wood")
 		button.add_theme_font_size_override("font_size", 32)
@@ -105,6 +105,43 @@ func _refresh() -> void:
 		observe_button.disabled = "lantern" not in placed_objects
 		status.text = "Lantern ready. Watch for movement on the Trail Cam." if "lantern" in placed_objects else "Tap Lantern in your Field Kit. If the clearing is full, tap a placed object to pack it up."
 		observe_button.text = "Watch the Trail Cam"
+	_refresh_guidance()
+
+func _tag_summary(tags: Dictionary) -> String:
+	var names: Array[String] = []
+	for tag in tags:
+		names.append(str(tag).capitalize())
+	names.sort()
+	return " • ".join(names)
+
+func _refresh_guidance() -> void:
+	var hint: Label = $Margin/VBox/Hint
+	if GameState.needs_first_hunt():
+		hint.text = "FIRST TRAIL • Place a Lantern, then watch the Trail Cam. Light draws curious creatures out of hiding."
+		return
+	if placed_objects.is_empty():
+		hint.text = _field_notes()
+		return
+	var best_id := ""
+	var best_match := -1001
+	for cryptid_id in cryptid_defs:
+		var match_strength := Attraction.setup_match(cryptid_defs[cryptid_id], placed_objects, object_defs)
+		if match_strength > best_match:
+			best_match = match_strength
+			best_id = str(cryptid_id)
+	if best_id.is_empty() or best_match <= 0:
+		hint.text = "SETUP READ • No strong match yet.\n" + _field_notes()
+		return
+	var definition: Dictionary = cryptid_defs[best_id]
+	var strength := "Strong match" if best_match >= 8 else "Faint match"
+	hint.text = "SETUP READ • %s for %s\n%s" % [strength, definition.get("name", best_id), definition.get("setup_hint", "Try a different mix of objects.")]
+
+func _field_notes() -> String:
+	var notes: Array[String] = []
+	for cryptid_id in cryptid_defs:
+		var definition: Dictionary = cryptid_defs[cryptid_id]
+		notes.append("%s: %s" % [definition.get("name", cryptid_id), definition.get("setup_hint", "Keep experimenting.")])
+	return "FIELD NOTES • " + "  |  ".join(notes)
 
 func _begin_observation() -> void:
 	var scores: Dictionary = {}

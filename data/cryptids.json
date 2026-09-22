@@ -9,6 +9,7 @@
       "night": 1,
       "heat": -1
     },
+    "setup_hint": "Lantern + forest. Avoid heat.",
     "clues": [
       "Strange red lights between the trees.",
       "Wing-shaped shadows cross the clearing.",
@@ -34,6 +35,7 @@
       "noise": -3,
       "light": -1
     },
+    "setup_hint": "Berry Bush + Hollow Log. Avoid noise.",
     "clues": [
       "Large footprints.",
       "Missing berries.",
@@ -56,6 +58,7 @@
     "required_objects": [
       "camping_chair"
     ],
+    "setup_hint": "Camping Chair + open space. Avoid cover.",
     "clues": [
       "Tall pale shapes cross open ground.",
       "Sightings cluster around strangely ordinary human objects."

@@ -71,6 +71,11 @@ jobs:
           test -f build/web/index.html
           test -f build/web/index.wasm
           test -f build/web/index.pck
+          test -f build/web/index.icon.png
+          test -f build/web/index.apple-touch-icon.png
+          test -f build/web/index.manifest.json
+          grep -q 'index.icon.png' build/web/index.html
+          grep -q 'index.apple-touch-icon.png' build/web/index.html
           echo "Web export contains the expected Godot runtime files."
 
       - name: Upload downloadable web build

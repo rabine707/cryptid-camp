@@ -8,7 +8,9 @@ func _ready() -> void:
 	_set_ink($Margin/VBox/Page/Content)
 	$Margin/VBox/Header/Back.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/main/main.tscn"))
 	var picker := OptionButton.new()
+	picker.name = "SpeciesPicker"
 	picker.custom_minimum_size.y = 144
+	picker.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	picker.get_popup().add_theme_font_size_override("font_size", 44)
 	picker.get_popup().add_theme_constant_override("v_separation", 48)
 	CampStyle.button(picker, "wood")

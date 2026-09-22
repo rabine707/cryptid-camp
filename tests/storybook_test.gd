@@ -41,6 +41,9 @@ func run() -> void:
 	var journal = load("res://scenes/journal/journal.tscn").instantiate()
 	root.add_child(journal)
 	await process_frame
+	var species_picker: OptionButton = journal.get_node("Margin/VBox/SpeciesPicker")
+	check(species_picker.alignment == HORIZONTAL_ALIGNMENT_CENTER, "journal species picker centers the selected name")
+	check(journal.get_node("Margin/VBox/Page/Content/Species").horizontal_alignment == HORIZONTAL_ALIGNMENT_CENTER, "journal page centers the species heading")
 	for id in ["mothling", "bigfoot", "nightcrawler"]:
 		journal.selected_species = id
 		journal._render()

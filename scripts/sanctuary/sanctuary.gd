@@ -17,7 +17,7 @@ var album_button: Button
 func _ready() -> void:
 	# The project scales its 1080 x 1920 canvas to the 360 x 640 test window.
 	var background := ColorRect.new()
-	background.color = Color("172f2c")
+	background.color = Color("10232a")
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(background)
@@ -40,7 +40,7 @@ func _ready() -> void:
 	var heading := VBoxContainer.new()
 	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(heading)
-	heading.add_child(_label("SANCTUARY", 52, Color("f3e5bc")))
+	heading.add_child(_label("Sanctuary", 66, Color("f3e5bc")))
 	activity_label = _label("A little wild. A little home.", 31, Color("b7c9ad"))
 	heading.add_child(activity_label)
 	world = CampWorld.new()
@@ -105,6 +105,8 @@ func _label(value: String, font_size: int, color: Color) -> Label:
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.add_theme_font_size_override("font_size", font_size)
+	if font_size < 42:
+		label.add_theme_font_override("font", ThemeDB.fallback_font)
 	label.add_theme_color_override("font_color", color)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return label

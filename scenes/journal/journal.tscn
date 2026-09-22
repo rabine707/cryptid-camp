@@ -38,7 +38,7 @@ text="Camp"
 [node name="Title" type="Label" parent="Margin/VBox/Header"]
 layout_mode=2
 size_flags_horizontal=3
-theme_override_font_sizes/font_size=46
+theme_override_font_sizes/font_size=56
 text="FIELD JOURNAL"
 horizontal_alignment=1
 [node name="Spacer" type="Control" parent="Margin/VBox/Header"]
@@ -50,19 +50,19 @@ size_flags_vertical=3
 layout_mode=2
 theme_override_constants/separation=20
 [node name="Species" type="Label" parent="Margin/VBox/Page/Content"]
-theme_override_font_sizes/font_size=42
+theme_override_font_sizes/font_size=54
 text="UNKNOWN #001"
 [node name="Sketch" type="Control" parent="Margin/VBox/Page/Content"]
 script = ExtResource("2")
 custom_minimum_size=Vector2(0,380)
 [node name="Status" type="Label" parent="Margin/VBox/Page/Content"]
-theme_override_font_sizes/font_size=32
+theme_override_font_sizes/font_size=38
 text="RUMORED"
 [node name="Notes" type="Label" parent="Margin/VBox/Page/Content"]
-theme_override_font_sizes/font_size=32
+theme_override_font_sizes/font_size=38
 autowrap_mode=2
 text="No reliable notes yet."
 [node name="Resident" type="Label" parent="Margin/VBox/Page/Content"]
-theme_override_font_sizes/font_size=32
+theme_override_font_sizes/font_size=38
 autowrap_mode=2
 text=""

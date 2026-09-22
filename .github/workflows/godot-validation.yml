@@ -29,3 +29,13 @@ jobs:
 
       - name: Run simulation smoke test
         run: godot --headless --path . --script res://tests/smoke_test.gd
+
+      - name: Validate naming and adoption
+        env:
+          XDG_DATA_HOME: /tmp/cryptid-camp-tests
+        run: godot --headless --path . --script res://tests/adoption_test.gd
+
+      - name: Validate storybook art and save compatibility
+        env:
+          XDG_DATA_HOME: /tmp/cryptid-camp-tests
+        run: godot --headless --path . --script res://tests/storybook_test.gd

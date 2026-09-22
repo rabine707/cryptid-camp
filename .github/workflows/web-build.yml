@@ -63,6 +63,8 @@ jobs:
           /tmp/godot/godot --headless --path . --script res://tests/first_hunt_test.gd
           /tmp/godot/godot --headless --path . --script res://tests/sanctuary_test.gd
           /tmp/godot/godot --headless --path . --script res://tests/decorating_test.gd
+          /tmp/godot/godot --headless --path . --script res://tests/adoption_test.gd
+          /tmp/godot/godot --headless --path . --script res://tests/storybook_test.gd
 
       - name: Verify required web files
         run: |

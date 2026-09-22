@@ -13,17 +13,21 @@ func _ready() -> void:
 	atmosphere.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(atmosphere)
 	move_child(atmosphere, 2)
-	$Margin/VBox/Sign.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+	$Margin/VBox/Sign.add_theme_stylebox_override("panel", CampStyle.wood_box())
 	$Margin/VBox/Sign/Title.add_theme_color_override("font_color", Color("f5e5ba"))
 	$Margin/VBox/Sign/Title.add_theme_color_override("font_shadow_color", Color("09130f"))
 	$Margin/VBox/Sign/Title.add_theme_constant_override("shadow_offset_y", 6)
+	$Margin/VBox/Sign/Title.add_theme_font_size_override("font_size", 124)
+	$Margin/VBox/Tagline.add_theme_font_override("font", ThemeDB.fallback_font)
+	$Margin/VBox/Tagline.add_theme_font_size_override("font_size", 34)
+	$Margin/VBox/Tagline.add_theme_stylebox_override("normal", CampStyle.panel(Color(0.035, 0.075, 0.085, 0.92), 12))
 	$Margin/VBox/Version.text = "A little strange. A little like home."
-	$Margin/VBox/Version.add_theme_font_size_override("font_size", 28)
+	$Margin/VBox/Version.add_theme_font_size_override("font_size", 34)
 	for path in ["WhisperingWoods", "Sanctuary"]:
 		CampStyle.button($Margin/VBox.get_node(path), "wood")
 	CampStyle.button($Margin/VBox/Journal, "green")
 	for control in [$Margin/VBox/WhisperingWoods, $Margin/VBox/Sanctuary, $Margin/VBox/Journal]:
-		control.add_theme_font_size_override("font_size", 36)
+		control.add_theme_font_size_override("font_size", 46)
 	$Margin/VBox/WhisperingWoods.pressed.connect(_open_whispering_woods)
 	$Margin/VBox/Sanctuary.pressed.connect(_open_sanctuary)
 	$Margin/VBox/Journal.pressed.connect(_open_journal)
@@ -32,12 +36,8 @@ func _ready() -> void:
 		$Margin/VBox/Tagline.text = "Start in Whispering Woods. Your Trail Cam is waiting."
 		$Margin/VBox/Tagline.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		CampStyle.button($Margin/VBox/WhisperingWoods, "green")
-		$Margin/VBox/WhisperingWoods.add_theme_font_size_override("font_size", 36)
-	# Calm translucent navigation lets the painting remain the focal point.
-	for button in [$Margin/VBox/Sanctuary, $Margin/VBox/Journal]:
-		button.add_theme_stylebox_override("normal", CampStyle.panel(Color(0.025, 0.09, 0.075, 0.91), 18, 2, Color("67735b")))
-	$Margin/VBox/WhisperingWoods.add_theme_stylebox_override("normal", CampStyle.panel(Color("b88a45"), 18, 2, Color("e9cd8f")))
-	$Margin/VBox/WhisperingWoods.add_theme_color_override("font_color", Color("15251d"))
+		$Margin/VBox/WhisperingWoods.add_theme_font_size_override("font_size", 46)
+	$Margin/VBox/WhisperingWoods.add_theme_color_override("font_color", Color("fff0cf"))
 
 func _open_whispering_woods() -> void:
 	get_tree().change_scene_to_file("res://scenes/lure_sites/whispering_woods.tscn")

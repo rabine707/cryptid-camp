@@ -1,1 +1,69 @@
-{"mothling":{"name":"Mothling","base_weight":10,"preferences":{"light":3,"forest":2,"human":1,"night":1,"heat":-1},"clues":["Strange red lights between the trees.","Wing-shaped shadows cross the clearing.","Artificial lights seem to fascinate it."],"trust_treat":"mothmallow","sanctuary_behavior":"hug_lamp","variants":["classic","autumn","luna"]},"bigfoot":{"name":"Bigfoot","base_weight":3,"preferences":{"forest":3,"cover":3,"fruit":2,"water":1,"human":-2,"noise":-3,"light":-1},"clues":["Large footprints.","Missing berries.","Wood knocking deeper in the trees."],"variants":["brown","cinnamon","silver"]},"nightcrawler":{"name":"Fresno Nightcrawler","base_weight":2,"preferences":{"open":3,"human":2,"cover":-2},"required_objects":["camping_chair"],"clues":["Tall pale shapes cross open ground.","Sightings cluster around strangely ordinary human objects."],"variants":["white","cream","moonlit"]}}
+{
+  "mothling": {
+    "name": "Mothling",
+    "base_weight": 10,
+    "preferences": {
+      "light": 3,
+      "forest": 2,
+      "human": 1,
+      "night": 1,
+      "heat": -1
+    },
+    "clues": [
+      "Strange red lights between the trees.",
+      "Wing-shaped shadows cross the clearing.",
+      "Artificial lights seem to fascinate it."
+    ],
+    "trust_treat": "mothmallow",
+    "sanctuary_behavior": "hug_lamp",
+    "variants": [
+      "classic",
+      "autumn",
+      "luna"
+    ]
+  },
+  "bigfoot": {
+    "name": "Sprigfoot",
+    "base_weight": 3,
+    "preferences": {
+      "forest": 3,
+      "cover": 3,
+      "fruit": 2,
+      "water": 1,
+      "human": -2,
+      "noise": -3,
+      "light": -1
+    },
+    "clues": [
+      "Large footprints.",
+      "Missing berries.",
+      "Wood knocking deeper in the trees."
+    ],
+    "variants": [
+      "brown",
+      "cinnamon",
+      "silver"
+    ]
+  },
+  "nightcrawler": {
+    "name": "Stilts",
+    "base_weight": 2,
+    "preferences": {
+      "open": 3,
+      "human": 2,
+      "cover": -2
+    },
+    "required_objects": [
+      "camping_chair"
+    ],
+    "clues": [
+      "Tall pale shapes cross open ground.",
+      "Sightings cluster around strangely ordinary human objects."
+    ],
+    "variants": [
+      "white",
+      "cream",
+      "moonlit"
+    ]
+  }
+}

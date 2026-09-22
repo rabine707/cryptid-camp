@@ -18,6 +18,9 @@ window/handheld/orientation=1
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 
+[gui]
+theme/custom="res://themes/camp_theme.tres"
+
 [autoload]
 GameState="*res://scripts/save/game_state.gd"
 TrailCamSession="*res://scripts/simulation/trail_cam_session.gd"

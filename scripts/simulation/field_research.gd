@@ -1,7 +1,7 @@
 class_name FieldResearch
 extends RefCounted
 ## Stable evidence IDs extend the existing save; no reset or currency migration.
-const NAMES := {"mothling": "Mothling", "bigfoot": "Bigfoot", "nightcrawler": "Fresno Nightcrawler"}
+const NAMES := {"mothling": "Mothling", "bigfoot": "Sprigfoot", "nightcrawler": "Stilts"}
 const CLUES := {
 	"red_eyes": {"label": "Red eyes beside the light", "matches": ["mothling", "bigfoot"]},
 	"wing_shadow": {"label": "A small, wing-shaped shadow", "matches": ["mothling"]},

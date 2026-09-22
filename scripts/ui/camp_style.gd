@@ -12,6 +12,22 @@ const PAPER := Color("#e8d5ad")
 const GOLD := Color("#d6a657")
 const DANGER := Color("#7f3f34")
 
+static func wood_box(tint := Color.WHITE) -> StyleBox:
+	var texture := ArtRegistry.texture_for("ui.wood")
+	if texture == null:
+		return panel(WOOD, 14, 2, GOLD)
+	var box := StyleBoxTexture.new()
+	box.texture = texture
+	box.region_rect = Rect2(20, 75, 2130, 555)
+	box.modulate_color = tint
+	for side in [SIDE_LEFT, SIDE_RIGHT]:
+		box.set_texture_margin(side, 48)
+		box.set_content_margin(side, 30)
+	for side in [SIDE_TOP, SIDE_BOTTOM]:
+		box.set_texture_margin(side, 24)
+		box.set_content_margin(side, 20)
+	return box
+
 static func panel(color: Color, radius := 18, border := 0, border_color := Color.TRANSPARENT) -> StyleBoxFlat:
 	var box := StyleBoxFlat.new()
 	box.bg_color = color
@@ -45,6 +61,13 @@ static func button(button: Button, kind := "wood") -> void:
 	button.add_theme_stylebox_override("normal", panel(base, 14, 2, Color("#1b1b16")))
 	button.add_theme_stylebox_override("hover", panel(hover, 14, 2, GOLD))
 	button.add_theme_stylebox_override("pressed", panel(base.darkened(0.18), 14, 2, GOLD))
+	if kind == "wood" or kind == "green":
+		var tint := Color.WHITE if kind == "wood" else Color("b2c99c")
+		button.add_theme_stylebox_override("normal", wood_box(tint))
+		button.add_theme_stylebox_override("hover", wood_box(tint.lightened(0.15)))
+		button.add_theme_stylebox_override("pressed", wood_box(tint.darkened(0.2)))
+		button.add_theme_stylebox_override("disabled", wood_box(Color("727d77")))
+	button.add_theme_stylebox_override("focus", panel(Color.TRANSPARENT, 14, 4, GOLD))
 	button.add_theme_color_override("font_color", INK if kind == "paper" else CREAM)
 	button.add_theme_color_override("font_hover_color", INK if kind == "paper" else Color.WHITE)
 	button.add_theme_font_size_override("font_size", 26)

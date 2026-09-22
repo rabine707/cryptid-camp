@@ -11,13 +11,17 @@ const Catalog = preload("res://scripts/sanctuary/decor_catalog.gd")
 const DecorationArt = preload("res://scripts/sanctuary/decoration_art.gd")
 
 const WORLD_SIZE := Vector2(360, 380)
-const POINTS := [Vector2(171, 161), Vector2(183, 204), Vector2(139, 251), Vector2(207, 264), Vector2(258, 211), Vector2(213, 316), Vector2(106, 276), Vector2(81, 311), Vector2(133, 326)]
+const POINTS := [Vector2(150, 116), Vector2(167, 170), Vector2(120, 215), Vector2(180, 259), Vector2(263, 172), Vector2(213, 308), Vector2(100, 248), Vector2(72, 279), Vector2(113, 319)]
+const CABIN_BOUNDS := Rect2(84, 33, 114, 74)
+const POND_BOUNDS := Rect2(245, 70, 96, 70)
+const FIRE_CENTER := Vector2(228, 218)
+const LAMP_POSITION := Vector2(98, 210)
 const LINKS := [[1], [0, 2, 3, 4], [1, 3, 6], [1, 2, 5], [1], [3], [2, 7, 8], [6], [6]]
 const PLOT_POINTS := {"garden_left": 7, "garden_right": 8}
 const TREES := [Vector3(19, 82, 1.05), Vector3(53, 60, 0.95), Vector3(294, 67, 1.1), Vector3(330, 96, 1.25), Vector3(16, 153, 1.15), Vector3(343, 174, 1.1), Vector3(20, 251, 1.0), Vector3(332, 282, 1.2), Vector3(38, 345, 1.15), Vector3(315, 365, 1.2), Vector3(12, 386, 1.25)]
 var resident: Dictionary = {}
 var lamp_placed := false
-var creature_position := Vector2(171, 161)
+var creature_position := POINTS[0]
 var destination := 0
 var route: Array[int] = []
 var waiting := 1.5
@@ -197,18 +201,18 @@ func _gui_input(event: InputEvent) -> void:
 	if not resident.is_empty() and point.distance_to(creature_position - Vector2(0, 15)) < 24.0:
 		greeting = 2.5
 		inspected.emit("%s gives a happy little flutter." % resident.get("name", "Your Mothling"))
-	elif point.distance_to(Vector2(284, 151)) < 43.0:
+	elif point.distance_to(POND_BOUNDS.get_center()) < 51.0:
 		ripple = 0.0
 		inspected.emit("STILLWATER POND\nSomething tiny ripples beneath the lily pads.")
-	elif point.distance_to(Vector2(233, 249)) < 26.0:
+	elif point.distance_to(FIRE_CENTER) < 28.0:
 		inspected.emit("THE FIRE CIRCLE\nA little crackle. A little warmth. Stay awhile.")
-	elif point.distance_to(Vector2(112, 240)) < 25.0:
+	elif point.distance_to(LAMP_POSITION) < 25.0:
 		if lamp_placed and not resident.is_empty():
 			visit_lamp()
 			inspected.emit("A familiar light calls your Mothling over.")
 		else:
 			inspected.emit("LANTERN NOOK\nThe perfect place for an Old Lamp.")
-	elif Rect2(70, 57, 128, 96).has_point(point):
+	elif CABIN_BOUNDS.has_point(point):
 		inspected.emit("CAMP CABIN\nA warm window. A place to come back to.")
 	else:
 		inspected.emit("Evening settles softly over your Sanctuary.")
@@ -235,15 +239,24 @@ func _sprite(slot: String, rectangle: Rect2) -> bool:
 func _draw() -> void:
 	draw_set_transform(Vector2.ZERO, 0.0, size / WORLD_SIZE)
 	draw_rect(Rect2(Vector2.ZERO, WORLD_SIZE), Color("203e36"))
-	if not _sprite("background.sanctuary", Rect2(Vector2.ZERO, WORLD_SIZE)):
+	var illustrated: Texture2D = textures.get("background.sanctuary")
+	if illustrated != null:
+		draw_texture_rect(illustrated, Rect2(Vector2.ZERO, WORLD_SIZE), false)
+		if ripple >= 0:
+			_ellipse(POND_BOUNDS.get_center(), Vector2(7 + ripple * 12, 3 + ripple * 6), Color(0.7, 0.88, 0.78, (2 - ripple) * 0.13))
+		_ellipse(FIRE_CENTER, Vector2(23, 16), Color(1, 0.68, 0.25, 0.035 + sin(elapsed * 3) * 0.015))
+	else:
 		_ground()
 	# Props and resident share foot-based depth ordering; replacement textures
 	# keep the same baseline and never change paths or gameplay state.
-	var props: Array[Dictionary] = [{"kind": "cabin", "y": 147.0}, {"kind": "pond", "y": 178.0}, {"kind": "fire", "y": 251.0}, {"kind": "lamp", "y": 246.0}]
+	var props: Array[Dictionary] = [{"kind": "lamp", "y": LAMP_POSITION.y}]
+	if illustrated == null:
+		props.append_array([{"kind": "cabin", "y": 147.0}, {"kind": "pond", "y": 178.0}, {"kind": "fire", "y": 251.0}])
 	for plot in Catalog.PLOTS:
 		props.append({"kind": "decoration", "y": POINTS[PLOT_POINTS[plot]].y, "plot": plot})
-	for tree in TREES:
-		props.append({"kind": "tree", "y": tree.y, "tree": tree})
+	if illustrated == null:
+		for tree in TREES:
+			props.append({"kind": "tree", "y": tree.y, "tree": tree})
 	if not resident.is_empty():
 		props.append({"kind": "resident", "y": creature_position.y})
 	props.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.y) < float(b.y))
@@ -403,7 +416,7 @@ func _fire() -> void:
 	draw_circle(Vector2(261, 263), 4, Color("c8aa77"))
 
 func _lamp() -> void:
-	var p := Vector2(111, 246)
+	var p := LAMP_POSITION
 	_ellipse(p, Vector2(20, 12), Color("8e8960"))
 	if not lamp_placed:
 		draw_arc(p, 13, 0, TAU, 32, Color("bdba8c"), 1, true)
@@ -412,7 +425,7 @@ func _lamp() -> void:
 		return
 	for i in range(4):
 		_ellipse(p - Vector2(0, 13), Vector2(18 + i * 8, 22 + i * 7), Color(1, 0.78, 0.36, 0.025))
-	if _sprite("decoration.old_lamp", Rect2(99, 211, 24, 40)):
+	if _sprite("decoration.old_lamp", Rect2(p - Vector2(12, 35), Vector2(24, 40))):
 		return
 	draw_line(p, p - Vector2(0, 38), Color("584c35"), 3, true)
 	draw_line(p - Vector2(0, 38), p + Vector2(12, -38), Color("584c35"), 3, true)

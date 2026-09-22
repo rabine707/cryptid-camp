@@ -5,11 +5,13 @@ var reveal := false
 var elapsed := 0.0
 var tick := 0.0
 var forest: Texture2D
+var portrait: Texture2D
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	clip_contents = true
 	forest = ArtRegistry.texture_for("background.whispering_woods")
+	portrait = ArtRegistry.texture_for("cryptid." + visitor + ".classic")
 
 func _process(delta: float) -> void:
 	elapsed += delta
@@ -42,7 +44,11 @@ func _draw() -> void:
 	for i in range(8):
 		draw_line(Vector2(0, 460 + i * 17), Vector2(960, 435 + i * 24), Color(0.2, 0.34, 0.21, 0.045), 16)
 	var body := Color("334a32") if reveal else Color("0b1b12")
-	if visitor == "mothling":
+	if reveal and portrait != null:
+		var bounds := Rect2(350, 180, 300, 340)
+		var fitted := portrait.get_size() * minf(bounds.size.x / portrait.get_width(), bounds.size.y / portrait.get_height())
+		draw_texture_rect(portrait, Rect2(bounds.get_center() - fitted / 2, fitted), false)
+	elif visitor == "mothling":
 		var flutter := sin(elapsed * 0.8) * 5
 		for direction in [-1, 1]:
 			var wing := PackedVector2Array([Vector2(492, 345), Vector2(492 + direction * 140, 250 + flutter), Vector2(492 + direction * 122, 370), Vector2(492 + direction * 60, 420), Vector2(492, 391)])

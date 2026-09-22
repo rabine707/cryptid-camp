@@ -97,7 +97,7 @@ func _run() -> void:
 	await _capture("sanctuary-warm-glow.png")
 	_tap(Vector2(284, 151))
 	_check(scene.moment.text.contains("STILLWATER"), "pond interaction responds")
-	_tap(Vector2(81, 311))
+	_tap(scene.world.POINTS[scene.world.PLOT_POINTS.garden_left])
 	_check(is_instance_valid(scene.sheet) and scene.sheet.current_plot == "garden_left", "garden plot opens the decoration picker")
 	scene._close_sheet()
 	scene.world.set_process(false)
@@ -150,6 +150,6 @@ func _run() -> void:
 	quit(0 if failures == 0 else 1)
 
 func _check_route(p: Vector2) -> void:
-	if p.distance_to(Vector2(233, 247)) < 23 or Rect2(239, 118, 88, 66).has_point(p) or Rect2(75, 50, 126, 103).has_point(p):
+	if p.distance_to(scene.world.FIRE_CENTER) < 28 or scene.world.POND_BOUNDS.has_point(p) or scene.world.CABIN_BOUNDS.has_point(p):
 		failures += 1
 		push_error("Walking route intersects scenery: " + str(p))

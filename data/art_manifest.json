@@ -1,11 +1,16 @@
 {
-  "version": 1,
-  "policy": "Prototype visuals are placeholders. Final public-facing art should be commissioned, licensed, or otherwise intentionally sourced.",
+  "version": 2,
+  "policy": "Storybook assets generated from user-supplied design references. Source prompts and font license are documented in docs/STORYBOOK_ART.md. Live text and controls remain separate from artwork.",
   "slots": {
-    "background.main_menu": "res://art/backgrounds/main_menu.png",
-    "background.whispering_woods": "res://art/backgrounds/whispering_woods.png",
-    "background.sanctuary": "res://art/backgrounds/sanctuary.png",
-    "cryptid.mothling.classic": "res://art/cryptids/mothling/classic.png",
+    "background.main_menu": "res://art/storybook/home.png",
+    "background.whispering_woods": "res://art/storybook/woods.png",
+    "background.sanctuary": "res://art/storybook/sanctuary.png",
+    "ui.wood": "res://art/storybook/wood.png",
+    "cryptid.bigfoot.classic": "res://art/storybook/sprigfoot.png",
+    "cryptid.nightcrawler.classic": "res://art/storybook/stilts.png",
+    "cryptid.scraps.classic": "res://art/storybook/scraps.png",
+    "cryptid.glimmer.classic": "res://art/storybook/glimmer.png",
+    "cryptid.mothling.classic": "res://art/storybook/mothling.png",
     "cryptid.mothling.autumn": "res://art/cryptids/mothling/autumn.png",
     "cryptid.mothling.luna": "res://art/cryptids/mothling/luna.png",
     "trail_cam.mothling": "res://art/trail_cam/mothling.png",
@@ -17,11 +22,59 @@
     "scenery.sanctuary.pine": "res://art/sanctuary/pine.png",
     "scenery.sanctuary.pond": "res://art/sanctuary/pond.png",
     "scenery.sanctuary.campfire": "res://art/sanctuary/campfire.png",
-    "decoration.old_lamp": "res://art/sanctuary/old_lamp.png",
-    "decoration.mushroom_stool": "res://art/sanctuary/mushroom_stool.png",
-    "decoration.flower_patch": "res://art/sanctuary/flower_patch.png",
-    "decoration.moss_cushion": "res://art/sanctuary/moss_cushion.png",
-    "decoration.wind_chimes": "res://art/sanctuary/wind_chimes.png",
-    "decoration.star_blanket": "res://art/sanctuary/star_blanket.png"
+    "decoration.old_lamp": {
+      "path": "res://art/storybook/decorations.png",
+      "region": [
+        0,
+        0,
+        512,
+        512
+      ]
+    },
+    "decoration.mushroom_stool": {
+      "path": "res://art/storybook/decorations.png",
+      "region": [
+        512,
+        0,
+        512,
+        512
+      ]
+    },
+    "decoration.flower_patch": {
+      "path": "res://art/storybook/decorations.png",
+      "region": [
+        1024,
+        0,
+        512,
+        512
+      ]
+    },
+    "decoration.moss_cushion": {
+      "path": "res://art/storybook/decorations.png",
+      "region": [
+        0,
+        512,
+        512,
+        512
+      ]
+    },
+    "decoration.wind_chimes": {
+      "path": "res://art/storybook/decorations.png",
+      "region": [
+        512,
+        512,
+        512,
+        512
+      ]
+    },
+    "decoration.star_blanket": {
+      "path": "res://art/storybook/decorations.png",
+      "region": [
+        1024,
+        512,
+        512,
+        512
+      ]
+    }
   }
 }

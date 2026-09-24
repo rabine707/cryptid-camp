@@ -131,7 +131,7 @@ func _build_home() -> void:
 	var activities := HBoxContainer.new()
 	activities.add_theme_constant_override("separation", 8)
 	page.add_child(activities)
-	for activity in [["Daily Check-In","checkin"],["Camp Chore","chore"],["Mystery Spot","mystery"]]:
+	for activity in [["Daily Check-In","checkin"],["Camp Chore","chore"],["Mystery Spot","mystery"],["Campfire Story","story"],["Resident Hangout","hangout"],["Lost & Found","lost"]]:
 		var activity_button := _button(activity[0], "paper")
 		activity_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		activity_button.pressed.connect(_daily_activity.bind(activity[1]))
@@ -173,6 +173,34 @@ func _daily_activity(kind: String) -> void:
 				var chores := ["Refill the lantern oil.", "Tidy the field notes.", "Gather fallen sticks by the fire.", "Check the trail cam batteries.", "Freshen the water by the dock."]
 				body = chores[abs(hash(day_key)) % chores.size()] + "\nDone! A tiny everyday camp moment has been recorded."
 				GameState.unlock_moment("daily_chore_" + day_key)
+		"story":
+			title = "CAMPFIRE STORY"
+			var stories := ["Someone swears a pair of red eyes watched the old bridge all night.", "A ranger once followed enormous footprints until they simply stopped.", "The lake went completely still just before something huge surfaced.", "Three lanterns flickered in sequence even though there was no wind.", "A traveler heard soft crying in the woods, but every trail led back to camp."]
+			body = stories[abs(hash(day_key + "story")) % stories.size()] + "\nCome back tomorrow for another campfire tale."
+		"hangout":
+			title = "RESIDENT HANGOUT"
+			if visitors.is_empty():
+				body = "The clearing is quiet. Befriend a cryptid and someone can hang out here."
+			elif today.get("hangout", false):
+				body = "You already spent some quality time with a resident today."
+			else:
+				today["hangout"] = true
+				var friend: Dictionary = visitors[abs(hash(day_key + "friend")) % visitors.size()]
+				body = "%s hangs out with you for a while. %s" % [_name(friend), _visitor_blurb(friend)]
+				GameState.change_trust(str(friend.get("id", "")), 1)
+		"lost":
+			title = "LOST & FOUND"
+			if today.get("lost", false):
+				body = "The Lost & Found box is empty again for today."
+			else:
+				today["lost"] = true
+				var objects := ["a bent bottle cap", "a smooth striped stone", "an old brass button", "a tiny blue feather", "a pinecone tied with red thread", "a strangely warm marble"]
+				var found: String = objects[abs(hash(day_key + "lost")) % objects.size()]
+				body = "You rummage through the box and find %s. It has been added to today's curiosities." % found
+				var curios: Array = GameState.state.get("curiosities", [])
+				if found not in curios:
+					curios.append(found)
+				GameState.state["curiosities"] = curios
 		"mystery":
 			title = "MYSTERY SPOT"
 			if today.get("mystery", false):

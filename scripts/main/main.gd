@@ -76,7 +76,7 @@ func _build_home() -> void:
 	progress.custom_minimum_size.x = 250
 	progress.alignment = BoxContainer.ALIGNMENT_CENTER
 	welcome_row.add_child(progress)
-	var discovered := GameState.state.get("discovered_species", []).size()
+	var discovered: int = int(GameState.state.get("discovered_species", []).size())
 	var count := _label("%d / 48" % discovered, 25, CampStyle.INK)
 	count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	progress.add_child(count)

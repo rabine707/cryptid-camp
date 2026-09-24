@@ -116,7 +116,7 @@ func _build_home() -> void:
 		var spots=[Vector2(.20,.64),Vector2(.48,.70),Vector2(.76,.61),Vector2(.52,.36)]
 		for i in range(mini(visitors.size(),4)): _add_visitor(layer,visitors[i],spots[i],i)
 
-	var bulletin := _home_card("CAMP BULLETIN", _camp_bulletin())
+	var bulletin := _home_card("CAMP BULLETIN", _camp_bulletin() + "\n\n" + _camp_progress_text())
 	page.add_child(bulletin)
 
 	var news := HBoxContainer.new()
@@ -135,7 +135,7 @@ func _build_home() -> void:
 	var activities := HBoxContainer.new()
 	activities.add_theme_constant_override("separation", 8)
 	page.add_child(activities)
-	for activity in [["Daily Check-In","checkin"],["Camp Chore","chore"],["Mystery Spot","mystery"],["Campfire Story","story"],["Resident Hangout","hangout"],["Lost & Found","lost"]]:
+	for activity in [["Daily Check-In","checkin"],["Camp Chore","chore"],["Mystery Spot","mystery"],["Campfire Story","story"],["Resident Hangout","hangout"],["Lost & Found","lost"],["Trail Cam","trailcam"],["Curio Shelf","curios"],["Camp Mail","mail"]]:
 		var activity_button := _button(activity[0], "paper")
 		activity_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		activity_button.pressed.connect(_daily_activity.bind(activity[1]))
@@ -204,6 +204,23 @@ func _daily_activity(kind: String) -> void:
 				if found not in curios: curios.append(found)
 				GameState.state["curiosities"] = curios
 				body = "You found a %s.\n\nAdded to Curios · %d collected" % [found, curios.size()]
+		"trailcam":
+			title = "TRAIL CAM"
+			var sightings := ["Nothing but a raccoon staring directly into the lens.", "A pale shape crosses the very edge of frame.", "Two bright eyes appear much higher than expected.", "The camera caught branches moving with no visible animal.", "A resident wandered past and investigated the camera.", "One frame is completely washed out by a strange glow."]
+			body = "Last night's camera card:\n\n" + sightings[abs(hash(day_key + "cam")) % sightings.size()]
+			if not GameState.state.get("discovered_species", []).is_empty():
+				body += "\n\nYour existing field notes may help explain it."
+		"curios":
+			title = "CURIO SHELF"
+			var curios: Array = GameState.state.get("curiosities", [])
+			if curios.is_empty():
+				body = "The shelf is empty. Check Lost & Found each day and strange little objects will start collecting here."
+			else:
+				body = "%d curios collected\n\n• %s" % [curios.size(), "\n• ".join(curios)]
+		"mail":
+			title = "CAMP MAIL"
+			var letters := ["RANGER NOTE\nHeard something knocking beyond the eastern trail. Didn't sound like a woodpecker.", "POSTCARD\nWish you were here. Something enormous moved under the lake this morning.", "FIELD OFFICE\nReminder: unusual tracks are evidence, not an invitation to chase things into the dark.", "ANONYMOUS NOTE\nYour lantern setup is visible from farther into the woods than you think.", "LOCAL TIP\nIf you hear crying near the wet trail, look for puddles before footprints."]
+			body = letters[abs(hash(day_key + "mail")) % letters.size()] + "\n\nNew mail arrives with the next day."
 		"mystery":
 			title = "MYSTERY SPOT"
 			if today.get("mystery", false):
@@ -263,6 +280,15 @@ func _complete_chore_step(button: Button, step: String, completed: Array, progre
 	GameState.persist()
 	panel.queue_free()
 	_show_activity_popup("CHORE COMPLETE", "Camp is ready for the day. You recorded a new everyday Camp Moment.")
+
+func _camp_progress_text() -> String:
+	var daily: Dictionary = GameState.state.get("daily_camp", {})
+	var today: Dictionary = daily.get(_today_key(), {})
+	var keys := ["checkin","chore","mystery","hangout","lost"]
+	var done := 0
+	for key in keys:
+		if today.get(key, false): done += 1
+	return "%d / %d daily discoveries complete" % [done, keys.size()]
 
 func _camp_bulletin() -> String:
 	var key := _today_key()

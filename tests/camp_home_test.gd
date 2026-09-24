@@ -18,6 +18,9 @@ func _initialize() -> void:
 	_check(_find_button(scene, "Camp Chore") != null, "daily camp chore exists")
 	_check(_find_button(scene, "Mystery Spot") != null, "daily mystery activity exists")
 	_check(_find_button(scene, "Lost & Found") != null, "lost and found exists")
+	_check(_find_button(scene, "Camp Mail") != null, "camp mail exists")
+	_check(_find_button(scene, "Curio Shelf") != null, "curio shelf exists")
+	_check(_find_button(scene, "Trail Cam") != null, "trail cam exists")
 	_check(_find_button(scene, "Resident Hangout") != null, "resident hangout exists")
 	_check(_find_button(scene, "Campfire Story") != null, "campfire story exists")
 	if failures > 0:

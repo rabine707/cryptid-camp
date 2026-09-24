@@ -55,6 +55,20 @@ jobs:
           /tmp/godot/godot --headless --path . --export-release "Web" build/web/index.html
           touch build/web/.nojekyll
 
+      - name: Version web cache for this build
+        run: |
+          # Godot PWA exports use stable filenames, so Safari can keep an older
+          # service-worker cache after a successful Pages deployment. Give the
+          # generated service worker a build-specific cache namespace.
+          WORKER="$(find build/web -maxdepth 1 -type f -name '*.service.worker.js' -print -quit)"
+          if [ -n "$WORKER" ]; then
+            sed -i "s/const CACHE_NAME = \"[^\"]*\"/const CACHE_NAME = \"cryptid-camp-${GITHUB_SHA}\"/" "$WORKER" || true
+            echo "Versioned service worker cache with ${GITHUB_SHA}."
+          else
+            echo "No Godot service worker found; continuing without PWA cache patch."
+          fi
+          printf '%s\n' "${GITHUB_SHA}" > build/web/build-version.txt
+
       - name: Validate guided hunt and save compatibility
         env:
           XDG_DATA_HOME: /tmp/cryptid-camp-tests

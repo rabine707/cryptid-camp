@@ -51,6 +51,8 @@ jobs:
 
       - name: Export release web build
         run: |
+          # Never let a previous export survive into the Pages artifact.
+          rm -rf build/web
           mkdir -p build/web
           /tmp/godot/godot --headless --path . --export-release "Web" build/web/index.html
           touch build/web/.nojekyll
@@ -62,7 +64,10 @@ jobs:
           # generated service worker a build-specific cache namespace.
           WORKER="$(find build/web -maxdepth 1 -type f -name '*.service.worker.js' -print -quit)"
           if [ -n "$WORKER" ]; then
-            sed -i "s/const CACHE_NAME = \"[^\"]*\"/const CACHE_NAME = \"cryptid-camp-${GITHUB_SHA}\"/" "$WORKER" || true
+            # Godot 4.3 derives CACHE_NAME from CACHE_PREFIX + CACHE_VERSION.
+            # Stamp CACHE_VERSION itself so every deployment activates a fresh cache.
+            sed -i "s/^const CACHE_VERSION = .*/const CACHE_VERSION = '${GITHUB_SHA}';/" "$WORKER"
+            grep -q "const CACHE_VERSION = '${GITHUB_SHA}';" "$WORKER"
             echo "Versioned service worker cache with ${GITHUB_SHA}."
           else
             echo "No Godot service worker found; continuing without PWA cache patch."
@@ -92,7 +97,9 @@ jobs:
           test -f build/web/index.manifest.json
           grep -q 'index.icon.png' build/web/index.html
           grep -q 'index.apple-touch-icon.png' build/web/index.html
-          echo "Web export contains the expected Godot runtime files."
+          grep -q "${GITHUB_SHA}" build/web/index.service.worker.js
+          test "$(cat build/web/build-version.txt)" = "${GITHUB_SHA}"
+          echo "Web export contains the expected Godot runtime files and deployment version."
 
       - name: Upload downloadable web build
         uses: actions/upload-artifact@v4

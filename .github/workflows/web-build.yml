@@ -59,13 +59,13 @@ jobs:
         env:
           XDG_DATA_HOME: /tmp/cryptid-camp-tests
         run: |
-          /tmp/godot/godot --headless --path . --script res://tests/smoke_test.gd
-          /tmp/godot/godot --headless --path . --script res://tests/first_hunt_test.gd
-          /tmp/godot/godot --headless --path . --script res://tests/sanctuary_test.gd
-          /tmp/godot/godot --headless --path . --script res://tests/decorating_test.gd
-          /tmp/godot/godot --headless --path . --script res://tests/adoption_test.gd
-          /tmp/godot/godot --headless --path . --script res://tests/storybook_test.gd
-          /tmp/godot/godot --headless --path . --script res://tests/encounter_guidance_test.gd
+          timeout 90s /tmp/godot/godot --headless --path . --script res://tests/smoke_test.gd
+          timeout 90s /tmp/godot/godot --headless --path . --script res://tests/first_hunt_test.gd
+          timeout 90s /tmp/godot/godot --headless --path . --script res://tests/sanctuary_test.gd
+          timeout 90s /tmp/godot/godot --headless --path . --script res://tests/decorating_test.gd
+          timeout 90s /tmp/godot/godot --headless --path . --script res://tests/adoption_test.gd
+          timeout 90s /tmp/godot/godot --headless --path . --script res://tests/storybook_test.gd
+          timeout 90s /tmp/godot/godot --headless --path . --script res://tests/encounter_guidance_test.gd
 
       - name: Verify required web files
         run: |

@@ -17,6 +17,9 @@ func _initialize() -> void:
 	_check(_find_button(scene, "Daily Check-In") != null, "daily check-in exists")
 	_check(_find_button(scene, "Camp Chore") != null, "daily camp chore exists")
 	_check(_find_button(scene, "Mystery Spot") != null, "daily mystery activity exists")
+	_check(_find_button(scene, "Campfire Story") != null, "campfire story exists")
+	_check(_find_button(scene, "Resident Hangout") != null, "resident hangout exists")
+	_check(_find_button(scene, "Lost & Found") != null, "lost and found exists")
 	if failures > 0:
 		push_error("CAMP HOME FAILURES: %d" % failures)
 		quit(1)

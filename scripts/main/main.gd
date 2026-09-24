@@ -50,7 +50,7 @@ func _build_camp_home() -> void:
 	greeting.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	weather_row.add_child(greeting)
 	var count := _adopted_count()
-	weather_row.add_child(_label("%d friends" % count, 26, CampStyle.GOLD))
+	weather_row.add_child(_label("%d friend%s" % [count, "" if count == 1 else "s"], 26, CampStyle.GOLD))
 
 	var scene_panel := PanelContainer.new()
 	scene_panel.custom_minimum_size.y = 900
@@ -78,14 +78,16 @@ func _build_camp_home() -> void:
 		grid.add_theme_constant_override("h_separation", 18)
 		grid.add_theme_constant_override("v_separation", 18)
 		camp.add_child(grid)
-		for id in visitors:
+		for visitor in visitors:
 			var card := PanelContainer.new()
-			card.custom_minimum_size = Vector2(450, 190)
+			card.custom_minimum_size = Vector2(0, 190)
+			card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			card.add_theme_stylebox_override("panel", CampStyle.panel(Color("e8d5ad"), 18, 3, CampStyle.WOOD))
 			var box := VBoxContainer.new()
 			card.add_child(box)
-			box.add_child(_label(_display_name(str(id)), 34, CampStyle.INK, HORIZONTAL_ALIGNMENT_CENTER))
-			box.add_child(_label("Visiting camp", 23, Color("5c4937"), HORIZONTAL_ALIGNMENT_CENTER))
+			box.add_child(_label(_visitor_name(visitor), 34, CampStyle.INK, HORIZONTAL_ALIGNMENT_CENTER))
+			box.add_child(_label(_visitor_species(visitor), 23, Color("5c4937"), HORIZONTAL_ALIGNMENT_CENTER))
+			box.add_child(_label("Visiting camp", 21, Color("5c4937"), HORIZONTAL_ALIGNMENT_CENTER))
 			grid.add_child(card)
 		var areas := _button("Visit Sanctuary Areas", "wood")
 		areas.custom_minimum_size.y = 110
@@ -121,13 +123,18 @@ func _adopted_count() -> int:
 			count += 1
 	return count
 
-func _display_name(id: String) -> String:
-	var data = GameState.state.get("cryptids", [])
-	for cryptid in data:
-		if str(cryptid.get("species", "")) == id and cryptid.get("adopted", false):
-			var nickname := str(cryptid.get("name", ""))
-			if not nickname.is_empty(): return nickname
-	return id.replace("_", " ").capitalize()
+func _visitor_name(visitor: Variant) -> String:
+	if visitor is Dictionary:
+		var nickname := str(visitor.get("name", "")).strip_edges()
+		if not nickname.is_empty():
+			return nickname
+		return str(visitor.get("species", "Unknown")).replace("_", " ").capitalize()
+	return str(visitor).replace("_", " ").capitalize()
+
+func _visitor_species(visitor: Variant) -> String:
+	if visitor is Dictionary:
+		return str(visitor.get("species", "cryptid")).replace("_", " ").capitalize()
+	return str(visitor).replace("_", " ").capitalize()
 
 func _label(value: String, size: int, color := CampStyle.CREAM, align := HORIZONTAL_ALIGNMENT_LEFT) -> Label:
 	var label := Label.new()

@@ -49,7 +49,7 @@ func _build_camp_home() -> void:
 	var greeting := _label("Tonight at Camp", 31)
 	greeting.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	weather_row.add_child(greeting)
-	var count := GameState.get_adopted_species().size()
+	var count := _adopted_count()
 	weather_row.add_child(_label("%d friends" % count, 26, CampStyle.GOLD))
 
 	var scene_panel := PanelContainer.new()
@@ -113,6 +113,13 @@ func _build_camp_home() -> void:
 			"areas": b.pressed.connect(_open_areas)
 			"journal": b.pressed.connect(_open_journal)
 		nav.add_child(b)
+
+func _adopted_count() -> int:
+	var count := 0
+	for cryptid in GameState.state.get("cryptids", []):
+		if cryptid.get("adopted", false):
+			count += 1
+	return count
 
 func _display_name(id: String) -> String:
 	var data = GameState.state.get("cryptids", [])

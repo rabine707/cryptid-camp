@@ -63,17 +63,29 @@ func _build_home() -> void:
 		utility.add_child(b)
 
 	var welcome := PanelContainer.new()
+	welcome.custom_minimum_size.y = 96
 	welcome.add_theme_stylebox_override("panel", CampStyle.panel(CampStyle.PAPER,14,3,CampStyle.WOOD))
 	page.add_child(welcome)
 	var welcome_row := HBoxContainer.new()
+	welcome_row.add_theme_constant_override("separation", 12)
 	welcome.add_child(welcome_row)
 	var greeting := _label(_daypart()+" at Camp", 27, CampStyle.INK)
 	greeting.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	welcome_row.add_child(greeting)
-	welcome_row.add_child(_label("%d / 48 discovered" % GameState.state.get("discovered_species",[]).size(),22,Color("5c4937")))
+	var progress := VBoxContainer.new()
+	progress.custom_minimum_size.x = 250
+	progress.alignment = BoxContainer.ALIGNMENT_CENTER
+	welcome_row.add_child(progress)
+	var discovered := GameState.state.get("discovered_species", []).size()
+	var count := _label("%d / 48" % discovered, 25, CampStyle.INK)
+	count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	progress.add_child(count)
+	var count_caption := _label("CRYPTIDS DISCOVERED", 15, Color("5c4937"))
+	count_caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	progress.add_child(count_caption)
 
 	var world := PanelContainer.new()
-	world.custom_minimum_size.y = 850
+	world.custom_minimum_size.y = 960
 	world.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	world.add_theme_stylebox_override("panel",CampStyle.panel(Color(0.02,0.10,0.08,0.20),20,3,CampStyle.WOOD_LIGHT))
 	page.add_child(world)
@@ -113,8 +125,20 @@ func _build_home() -> void:
 	quick.custom_minimum_size.x=290
 	quick.add_theme_constant_override("separation",8)
 	news.add_child(quick)
-	var woods:=_button("Whispering Woods","wood"); woods.pressed.connect(_open_woods); quick.add_child(woods)
-	var sanctuary:=_button("Sanctuary Areas","wood"); sanctuary.pressed.connect(_open_areas); quick.add_child(sanctuary)
+	var woods:=_button("Explore Woods","wood"); woods.pressed.connect(_open_woods); quick.add_child(woods)
+	var sanctuary:=_button("Visit Sanctuary","wood"); sanctuary.pressed.connect(_open_areas); quick.add_child(sanctuary)
+
+	var footer := HBoxContainer.new()
+	footer.add_theme_constant_override("separation", 8)
+	page.add_child(footer)
+	var field_note := _button("Field Notes", "paper")
+	field_note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	field_note.pressed.connect(_open_journal)
+	footer.add_child(field_note)
+	var collection_note := _button("Resident Areas", "paper")
+	collection_note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	collection_note.pressed.connect(_open_areas)
+	footer.add_child(collection_note)
 	_add_build_badge()
 
 func _add_visitor(layer:Control,c:Dictionary,pos:Vector2,index:int)->void:
@@ -124,11 +148,11 @@ func _add_visitor(layer:Control,c:Dictionary,pos:Vector2,index:int)->void:
 	resident.anchor_left=pos.x; resident.anchor_right=pos.x
 	resident.anchor_top=pos.y; resident.anchor_bottom=pos.y
 	resident.position=Vector2(-105,-110)
-	resident.custom_minimum_size=Vector2(210,220)
+	resident.custom_minimum_size=Vector2(230,235)
 	var portrait:=TextureButton.new()
 	portrait.ignore_texture_size=true
 	portrait.stretch_mode=TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-	portrait.custom_minimum_size=Vector2(210,165)
+	portrait.custom_minimum_size=Vector2(230,180)
 	portrait.texture_normal=_cryptid_texture(c)
 	portrait.pressed.connect(_visitor_tapped.bind(c))
 	resident.add_child(portrait)

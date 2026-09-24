@@ -4,7 +4,6 @@ var visitors: Array = []
 
 func _ready() -> void:
 	_build_home()
-	_add_build_badge()
 
 func _add_build_badge() -> void:
 	var badge := _label("BUILD DEV", 16, Color("d8cda9"))
@@ -114,6 +113,7 @@ func _build_home() -> void:
 	news.add_child(quick)
 	var woods:=_button("Whispering Woods","wood"); woods.pressed.connect(_open_woods); quick.add_child(woods)
 	var sanctuary:=_button("Sanctuary Areas","wood"); sanctuary.pressed.connect(_open_areas); quick.add_child(sanctuary)
+	_add_build_badge()
 
 func _add_visitor(layer:Control,c:Dictionary,pos:Vector2,index:int)->void:
 	var resident:=VBoxContainer.new()

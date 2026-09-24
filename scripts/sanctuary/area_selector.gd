@@ -53,7 +53,7 @@ func _ready() -> void:
 		var name := str(data.get("name", area_id))
 		text_box.add_child(_label(name, 43, Color("342417")))
 		text_box.add_child(_label(AREA_DESCRIPTIONS.get(area_id, ""), 27, Color("5c4937")))
-		var count := data.get("residents", []).size()
+		var count: int = int(data.get("residents", []).size())
 		var status := "%d / 6 Residents" % count if data.get("unlocked", false) else "Locked · discover more areas"
 		text_box.add_child(_label(status, 29, Color("41604b")))
 		var visit := _button("Visit ›" if data.get("unlocked", false) else "🔒")

@@ -4,6 +4,16 @@ var visitors: Array = []
 
 func _ready() -> void:
 	_build_home()
+	_add_build_badge()
+
+func _add_build_badge() -> void:
+	var badge := _label("BUILD DEV", 16, Color("d8cda9"))
+	badge.name = "BuildBadge"
+	badge.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	badge.position = Vector2(-250, -42)
+	badge.custom_minimum_size = Vector2(230, 28)
+	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	add_child(badge)
 
 func _build_home() -> void:
 	for child in get_children(): child.queue_free()

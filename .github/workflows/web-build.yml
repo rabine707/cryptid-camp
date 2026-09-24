@@ -49,6 +49,16 @@ jobs:
       - name: Import project assets
         run: /tmp/godot/godot --headless --path . --editor --quit
 
+      - name: Stamp visible build version
+        run: |
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          PR_LABEL="main"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            PR_LABEL="PR #${{ github.event.pull_request.number }}"
+          fi
+          sed -i "s/BUILD DEV/BUILD ${PR_LABEL} · ${SHORT_SHA}/" scripts/main/main.gd
+          grep -q "BUILD ${PR_LABEL} · ${SHORT_SHA}" scripts/main/main.gd
+
       - name: Export release web build
         run: |
           # Never let a previous export survive into the Pages artifact.

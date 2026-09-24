@@ -165,14 +165,8 @@ func _daily_activity(kind: String) -> void:
 				today["checkin"] = true
 				body = "Checked in! Everyone at camp gets a little extra attention today."
 		"chore":
-			title = "CAMP CHORE"
-			if today.get("chore", false):
-				body = "Today's camp chore is already done. Nice work."
-			else:
-				today["chore"] = true
-				var chores := ["Refill the lantern oil.", "Tidy the field notes.", "Gather fallen sticks by the fire.", "Check the trail cam batteries.", "Freshen the water by the dock."]
-				body = chores[abs(hash(day_key)) % chores.size()] + "\nDone! A tiny everyday camp moment has been recorded."
-				GameState.unlock_moment("daily_chore_" + day_key)
+			_open_chore_game(day_key, daily, today)
+			return
 		"story":
 			title = "CAMPFIRE STORY"
 			var stories := ["Someone swears a pair of red eyes watched the old bridge all night.", "A ranger once followed enormous footprints until they simply stopped.", "The lake went completely still just before something huge surfaced.", "Three lanterns flickered in sequence even though there was no wind.", "A traveler heard soft crying in the woods, but every trail led back to camp."]
@@ -214,6 +208,55 @@ func _daily_activity(kind: String) -> void:
 	GameState.state["daily_camp"] = daily
 	GameState.persist()
 	_show_activity_popup(title, body)
+
+func _open_chore_game(day_key: String, daily: Dictionary, today: Dictionary) -> void:
+	if today.get("chore", false):
+		_show_activity_popup("CAMP CHORE", "Today's camp chore is already done. Nice work.")
+		return
+	var chores := [
+		{"name":"Gather Firewood","prompt":"The campfire is running low. Gather three good pieces of firewood.","targets":["Pick up branch","Pick up log","Pick up kindling"]},
+		{"name":"Check Trail Cam","prompt":"The trail cam needs attention before tonight.","targets":["Open camera","Swap battery","Test flash"]},
+		{"name":"Refill Lanterns","prompt":"Three lanterns need oil before dark.","targets":["Fill dock lantern","Fill path lantern","Fill gate lantern"]},
+		{"name":"Freshen the Pond","prompt":"Help tidy the little water area.","targets":["Clear leaves","Refill basin","Set water dish"]},
+		{"name":"Field Notes","prompt":"Get today's observation kit ready.","targets":["Sharpen pencil","Pack notebook","Mark the map"]}
+	]
+	var chore: Dictionary = chores[abs(hash(day_key)) % chores.size()]
+	var panel := _home_card("CAMP CHORE · " + str(chore["name"]).to_upper(), str(chore["prompt"]))
+	panel.name = "ChoreGame"
+	panel.set_anchors_preset(Control.PRESET_CENTER)
+	panel.position = Vector2(-360, -300)
+	panel.custom_minimum_size = Vector2(720, 600)
+	var box: VBoxContainer = panel.get_child(0)
+	var progress := _label("0 / 3 tasks complete", 21, Color("5c4937"))
+	progress.name = "ChoreProgress"
+	box.add_child(progress)
+	var completed: Array = []
+	for target in chore["targets"]:
+		var task := _button(str(target), "paper")
+		task.pressed.connect(_complete_chore_step.bind(task, str(target), completed, progress, panel, day_key, daily, today))
+		box.add_child(task)
+	var cancel := _button("Back to Camp", "wood")
+	cancel.pressed.connect(panel.queue_free)
+	box.add_child(cancel)
+	add_child(panel)
+
+func _complete_chore_step(button: Button, step: String, completed: Array, progress: Label, panel: PanelContainer, day_key: String, daily: Dictionary, today: Dictionary) -> void:
+	if step in completed:
+		return
+	completed.append(step)
+	button.text = "Done · " + step
+	button.disabled = true
+	progress.text = "%d / 3 tasks complete" % completed.size()
+	if completed.size() < 3:
+		return
+	today["chore"] = true
+	today["last_activity"] = "chore"
+	daily[day_key] = today
+	GameState.state["daily_camp"] = daily
+	GameState.unlock_moment("daily_chore_" + day_key)
+	GameState.persist()
+	panel.queue_free()
+	_show_activity_popup("CHORE COMPLETE", "Camp is ready for the day. You recorded a new everyday Camp Moment.")
 
 func _show_activity_popup(title: String, body: String) -> void:
 	var old := get_node_or_null("DailyActivityPopup")

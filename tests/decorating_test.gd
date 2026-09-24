@@ -182,7 +182,7 @@ func _run() -> void:
 	await process_frame
 	_check(current_scene != null and current_scene.scene_file_path == "res://scenes/sanctuary/area_selector.tscn", "leaving a decoration visit opens the Sanctuary area selector")
 	# The legacy decorated camp remains available while the new area UI is introduced.
-	get_tree().change_scene_to_file("res://scenes/sanctuary/sanctuary.tscn")
+	change_scene_to_file("res://scenes/sanctuary/sanctuary.tscn")
 	await process_frame
 	await process_frame
 	scene = current_scene

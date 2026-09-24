@@ -90,7 +90,9 @@ func _build_home() -> void:
 	if visitors.is_empty():
 		var empty:=_label("The clearing is quiet.\nHead into the woods and see who is out there.",32,CampStyle.CREAM)
 		empty.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-		empty.set_anchors_preset(Control.PRESET_CENTER_WIDE)
+		empty.set_anchors_preset(Control.PRESET_CENTER_TOP)
+		empty.anchor_left = 0.0
+		empty.anchor_right = 1.0
 		empty.offset_top=-80; empty.offset_bottom=40
 		layer.add_child(empty)
 		var go:=_button("Explore Whispering Woods","green")

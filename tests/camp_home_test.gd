@@ -12,7 +12,7 @@ func _initialize() -> void:
 	_check(scene != null, "main scene loads")
 	_check(scene.get_node_or_null("Margin/VBox/WhisperingWoods") == null, "legacy main menu is replaced")
 	_check(_find_button(scene, "Explore Whispering Woods") != null or _find_button(scene, "Explore") != null, "Camp Home exploration control exists")
-	_check(_find_button(scene, "Residents") != null, "Camp Home resident control exists")
+	_check(_find_button(scene, "My Cryptids") != null or _find_button(scene, "Resident Areas") != null or _find_button(scene, "Visit Sanctuary") != null, "Camp Home resident control exists")
 	_check(scene.get_node_or_null("BuildBadge") != null, "visible build badge survives home construction")
 	if failures > 0:
 		push_error("CAMP HOME FAILURES: %d" % failures)

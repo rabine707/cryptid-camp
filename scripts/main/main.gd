@@ -128,6 +128,15 @@ func _build_home() -> void:
 	var woods:=_button("Explore Woods","wood"); woods.pressed.connect(_open_woods); quick.add_child(woods)
 	var sanctuary:=_button("Visit Sanctuary","wood"); sanctuary.pressed.connect(_open_areas); quick.add_child(sanctuary)
 
+	var activities := HBoxContainer.new()
+	activities.add_theme_constant_override("separation", 8)
+	page.add_child(activities)
+	for activity in [["Daily Check-In","checkin"],["Camp Chore","chore"],["Mystery Spot","mystery"]]:
+		var activity_button := _button(activity[0], "paper")
+		activity_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		activity_button.pressed.connect(_daily_activity.bind(activity[1]))
+		activities.add_child(activity_button)
+
 	var footer := HBoxContainer.new()
 	footer.add_theme_constant_override("separation", 8)
 	page.add_child(footer)
@@ -140,6 +149,61 @@ func _build_home() -> void:
 	collection_note.pressed.connect(_open_areas)
 	footer.add_child(collection_note)
 	_add_build_badge()
+
+func _daily_activity(kind: String) -> void:
+	var day_key := _today_key()
+	var daily: Dictionary = GameState.state.get("daily_camp", {})
+	var today: Dictionary = daily.get(day_key, {})
+	var title := ""
+	var body := ""
+	match kind:
+		"checkin":
+			title = "DAILY CHECK-IN"
+			if today.get("checkin", false):
+				body = "You already checked in today. The campfire is still warm."
+			else:
+				today["checkin"] = true
+				body = "Checked in! Everyone at camp gets a little extra attention today."
+		"chore":
+			title = "CAMP CHORE"
+			if today.get("chore", false):
+				body = "Today's camp chore is already done. Nice work."
+			else:
+				today["chore"] = true
+				var chores := ["Refill the lantern oil.", "Tidy the field notes.", "Gather fallen sticks by the fire.", "Check the trail cam batteries.", "Freshen the water by the dock."]
+				body = chores[abs(hash(day_key)) % chores.size()] + "\nDone! A tiny everyday camp moment has been recorded."
+				GameState.unlock_moment("daily_chore_" + day_key)
+		"mystery":
+			title = "MYSTERY SPOT"
+			if today.get("mystery", false):
+				body = "You already investigated today's strange little spot."
+			else:
+				today["mystery"] = true
+				var finds := ["Tiny tracks circle the edge of camp.", "Something shiny was tucked beneath a log.", "A few unfamiliar hairs cling to the fence.", "The lantern glass has a strange little handprint.", "Something moved the stones beside the path."]
+				body = finds[abs(hash(day_key + "mystery")) % finds.size()] + "\nYou add the observation to today's camp notes."
+	today["last_activity"] = kind
+	daily[day_key] = today
+	GameState.state["daily_camp"] = daily
+	GameState.persist()
+	_show_activity_popup(title, body)
+
+func _show_activity_popup(title: String, body: String) -> void:
+	var old := get_node_or_null("DailyActivityPopup")
+	if old != null:
+		old.queue_free()
+	var panel := _home_card(title, body)
+	panel.name = "DailyActivityPopup"
+	panel.set_anchors_preset(Control.PRESET_CENTER)
+	panel.position = Vector2(-360, -210)
+	panel.custom_minimum_size = Vector2(720, 420)
+	var close := _button("Back to Camp", "wood")
+	close.pressed.connect(panel.queue_free)
+	panel.get_child(0).add_child(close)
+	add_child(panel)
+
+func _today_key() -> String:
+	var date := Time.get_date_dict_from_system()
+	return "%04d-%02d-%02d" % [int(date.get("year", 0)), int(date.get("month", 0)), int(date.get("day", 0))]
 
 func _add_visitor(layer:Control,c:Dictionary,pos:Vector2,index:int)->void:
 	var resident:=VBoxContainer.new()

@@ -134,13 +134,12 @@ func _run() -> void:
 	scene._go_map()
 	await process_frame
 	await process_frame
-	_check(current_scene != null and current_scene.scene_file_path == "res://scenes/main/main.tscn", "Map navigation still works")
-	current_scene.get_node("Margin/VBox/Sanctuary").pressed.emit()
+	_check(current_scene != null and current_scene.scene_file_path == "res://scenes/sanctuary/area_selector.tscn", "Sanctuary navigation opens the area selector")
+	current_scene._visit_area("whispering_grove")
 	await process_frame
 	await process_frame
-	_check(current_scene != null and current_scene.scene_file_path == "res://scenes/sanctuary/sanctuary.tscn", "map Sanctuary button returns to camp")
-	current_scene.lamp_button.pressed.emit()
-	current_scene._go_map()
+	_check(current_scene != null and current_scene.scene_file_path == "res://scenes/sanctuary/area.tscn", "area selector opens a Sanctuary area")
+	current_scene.get_tree().change_scene_to_file("res://scenes/main/main.tscn")
 	await process_frame
 	await process_frame
 	_check(current_scene.scene_file_path == "res://scenes/main/main.tscn", "navigation during a lamp visit safely stops movement")

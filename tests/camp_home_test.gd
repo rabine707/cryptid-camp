@@ -1,5 +1,7 @@
 extends SceneTree
 
+var failures := 0
+
 func _initialize() -> void:
 	print("CAMP HOME RUNTIME TEST")
 	await process_frame
@@ -12,6 +14,9 @@ func _initialize() -> void:
 	_check(_find_button(scene, "Explore Whispering Woods") != null or _find_button(scene, "Explore") != null, "Camp Home exploration control exists")
 	_check(_find_button(scene, "Residents") != null, "Camp Home resident control exists")
 	_check(scene.get_node_or_null("BuildBadge") != null, "visible build badge survives home construction")
+	if failures > 0:
+		push_error("CAMP HOME FAILURES: %d" % failures)
+		quit(1)
 	print("ALL CAMP HOME TESTS PASSED")
 	quit(0)
 
@@ -26,6 +31,7 @@ func _find_button(root: Node, label: String) -> Button:
 
 func _check(condition: bool, label: String) -> void:
 	if not condition:
+		failures += 1
 		push_error("FAIL: " + label)
-		quit(1)
+		return
 	print("PASS: " + label)

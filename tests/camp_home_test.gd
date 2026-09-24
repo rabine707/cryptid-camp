@@ -14,6 +14,9 @@ func _initialize() -> void:
 	_check(_find_button(scene, "Explore Whispering Woods") != null or _find_button(scene, "Explore") != null, "Camp Home exploration control exists")
 	_check(_find_button(scene, "My Cryptids") != null or _find_button(scene, "Resident Areas") != null or _find_button(scene, "Visit Sanctuary") != null, "Camp Home resident control exists")
 	_check(scene.get_node_or_null("BuildBadge") != null, "visible build badge survives home construction")
+	_check(_find_button(scene, "Daily Check-In") != null, "daily check-in exists")
+	_check(_find_button(scene, "Camp Chore") != null, "daily camp chore exists")
+	_check(_find_button(scene, "Mystery Spot") != null, "daily mystery activity exists")
 	if failures > 0:
 		push_error("CAMP HOME FAILURES: %d" % failures)
 		quit(1)

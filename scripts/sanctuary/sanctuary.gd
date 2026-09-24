@@ -205,4 +205,5 @@ func _update_album_count() -> void:
 	album_button.text = "Moments %d/6" % count
 
 func _go_map() -> void:
-	get_tree().change_scene_to_file("res://scenes/main/main.tscn")
+	# Sanctuary now opens into the area/room selector rather than jumping straight home.
+	get_tree().change_scene_to_file("res://scenes/sanctuary/area_selector.tscn")

@@ -152,3 +152,67 @@ func set_sanctuary_plot(plot: String, item: String) -> bool:
 		state = before
 		return false
 	return true
+
+
+func get_sanctuary_areas() -> Dictionary:
+	return state.get("sanctuary_areas", SaveManager.default_sanctuary_areas())
+
+func get_area_residents(area_id: String) -> Array:
+	var areas := get_sanctuary_areas()
+	if not areas.has(area_id):
+		return []
+	return areas[area_id].get("residents", []).duplicate()
+
+func assign_resident_to_area(area_id: String, cryptid_id: String) -> bool:
+	var areas := get_sanctuary_areas()
+	if not areas.has(area_id) or not areas[area_id].get("unlocked", false):
+		return false
+	var owned := false
+	for cryptid in state.get("cryptids", []):
+		if cryptid.get("id") == cryptid_id and cryptid.get("adopted", false):
+			owned = true
+			break
+	if not owned:
+		return false
+	# One home per resident. Moving a cryptid removes it from its previous area.
+	for id in areas:
+		var residents: Array = areas[id].get("residents", [])
+		residents.erase(cryptid_id)
+		areas[id]["residents"] = residents
+	var target: Array = areas[area_id].get("residents", [])
+	if target.size() >= 6:
+		return false
+	target.append(cryptid_id)
+	areas[area_id]["residents"] = target
+	state["sanctuary_areas"] = areas
+	persist()
+	return true
+
+func remove_resident_from_area(area_id: String, cryptid_id: String) -> bool:
+	var areas := get_sanctuary_areas()
+	if not areas.has(area_id):
+		return false
+	var residents: Array = areas[area_id].get("residents", [])
+	if cryptid_id not in residents:
+		return false
+	residents.erase(cryptid_id)
+	areas[area_id]["residents"] = residents
+	state["sanctuary_areas"] = areas
+	persist()
+	return true
+
+func get_camp_visitors(limit: int = 4) -> Array:
+	# Camp Home is a rotating snapshot, not housing. Prefer residents who have
+	# not occupied the four visible slots recently, while remaining deterministic
+	# enough to avoid reshuffling every frame.
+	var adopted: Array = []
+	for cryptid in state.get("cryptids", []):
+		if cryptid.get("adopted", false):
+			adopted.append(cryptid)
+	if adopted.size() <= limit:
+		return adopted
+	var day_bucket := int(Time.get_unix_time_from_system() / 21600) # refresh about 4x/day
+	adopted.sort_custom(func(a: Dictionary, b: Dictionary):
+		return hash(str(a.get("id","")) + str(day_bucket)) < hash(str(b.get("id","")) + str(day_bucket))
+	)
+	return adopted.slice(0, limit)

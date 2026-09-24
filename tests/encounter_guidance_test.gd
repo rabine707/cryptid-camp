@@ -34,9 +34,10 @@ func _run() -> void:
 	check(moth_light > sprig_light, "lantern and forest guidance favors Mothling")
 	var woodland: Array[String] = ["berry_bush", "hollow_log", "pine_tree"]
 	check(Attraction.setup_match(cryptids.bigfoot, woodland, objects) > Attraction.setup_match(cryptids.mothling, woodland, objects), "fruit and cover guidance favors Sprigfoot")
-	check(Attraction.setup_match(cryptids.nightcrawler, ["camping_chair"], objects) > Attraction.setup_match(cryptids.mothling, ["camping_chair"], objects), "required chair guidance favors Stilts")
-	check(Attraction.setup_match(cryptids.nightcrawler, ["lantern"], objects) < 0, "Stilts guide rejects setups without a chair")
-	check(Attraction.score(cryptids.nightcrawler, ["camping_chair"], objects, {"is_night":true}) > Attraction.score(cryptids.mothling, ["camping_chair"], objects, {"is_night":true}), "required chair also makes Stilts the likelier visitor")
+	check(Attraction.setup_match(cryptids.nightcrawler, ["camping_chair"], objects, {"is_night":true}) > Attraction.setup_match(cryptids.mothling, ["camping_chair"], objects, {"is_night":true}), "open nighttime setup favors Stilts")
+	check(Attraction.setup_match(cryptids.nightcrawler, ["wildflowers"], objects, {"is_night":true}) > 0, "Stilts can like open space without requiring one exact prop")
+	check(Attraction.setup_match(cryptids.nightcrawler, ["hollow_log"], objects, {"is_night":true}) < Attraction.setup_match(cryptids.nightcrawler, ["camping_chair"], objects, {"is_night":true}), "heavy cover is less suitable for Stilts")
+	check(Attraction.setup_band(Attraction.setup_match(cryptids.mothling, ["lantern", "pine_tree"], objects, {"is_night":true})) in ["strong", "exceptional"], "guidance exposes a readable strength band")
 
 	game.state = SaveManager.default_state()
 	game.state.discovered_species = ["mothling"]

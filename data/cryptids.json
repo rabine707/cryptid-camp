@@ -1,15 +1,18 @@
 {
   "mothling": {
     "name": "Mothling",
+    "original_cryptid": "Mothman",
+    "rarity": "common",
     "base_weight": 10,
     "preferences": {
+      "night": 2,
       "light": 3,
       "forest": 2,
       "human": 1,
-      "night": 1,
-      "heat": -1
+      "noise": -1,
+      "heat": -2
     },
-    "setup_hint": "Lantern + forest. Avoid heat.",
+    "setup_hint": "Try a quiet forest setup with a little light after dark.",
     "clues": [
       "Strange red lights between the trees.",
       "Wing-shaped shadows cross the clearing.",
@@ -17,6 +20,7 @@
     ],
     "trust_treat": "mothmallow",
     "sanctuary_behavior": "hug_lamp",
+    "moment": "lantern_watch",
     "variants": [
       "classic",
       "autumn",
@@ -25,22 +29,25 @@
   },
   "bigfoot": {
     "name": "Sprigfoot",
+    "original_cryptid": "Bigfoot / Sasquatch",
+    "rarity": "rare",
     "base_weight": 3,
     "preferences": {
       "forest": 3,
-      "cover": 3,
+      "cover": 2,
       "fruit": 2,
-      "water": 1,
+      "natural": 1,
       "human": -2,
-      "noise": -3,
-      "light": -1
+      "noise": -3
     },
-    "setup_hint": "Berry Bush + Hollow Log. Avoid noise.",
+    "setup_hint": "Natural cover, berries, and quiet woods make promising signs.",
     "clues": [
       "Large footprints.",
       "Missing berries.",
       "Wood knocking deeper in the trees."
     ],
+    "sanctuary_behavior": "collect_sticks",
+    "moment": "tiny_big_tracks",
     "variants": [
       "brown",
       "cinnamon",
@@ -49,24 +56,187 @@
   },
   "nightcrawler": {
     "name": "Stilts",
+    "original_cryptid": "Fresno Nightcrawler",
+    "rarity": "uncommon",
     "base_weight": 2,
     "preferences": {
+      "night": 2,
       "open": 3,
-      "human": 2,
-      "cover": -2
+      "human": 1,
+      "cover": -2,
+      "noise": -1
     },
-    "required_objects": [
-      "camping_chair"
-    ],
-    "setup_hint": "Camping Chair + open space. Avoid cover.",
+    "setup_hint": "Keep an open, quiet patch where something tall could wander through.",
     "clues": [
       "Tall pale shapes cross open ground.",
       "Sightings cluster around strangely ordinary human objects."
     ],
+    "sanctuary_behavior": "night_walk",
+    "moment": "moonlit_tracks",
     "variants": [
       "white",
       "cream",
       "moonlit"
+    ]
+  },
+  "froglet": {
+    "name": "Froglet",
+    "original_cryptid": "Loveland Frog",
+    "rarity": "uncommon",
+    "base_weight": 5,
+    "preferences": {
+      "water": 3,
+      "damp": 3,
+      "forest": 1,
+      "floral": 1,
+      "heat": -2
+    },
+    "setup_hint": "Water and damp plant life make the clearing feel inviting.",
+    "clues": [
+      "Small wet footprints stop abruptly.",
+      "A strange croak answers from the creek.",
+      "Something watches from beside the water."
+    ],
+    "sanctuary_behavior": "pond_play",
+    "moment": "puddle_party",
+    "variants": [
+      "moss",
+      "river",
+      "speckled"
+    ]
+  },
+  "squonk": {
+    "name": "Squonk",
+    "original_cryptid": "Squonk",
+    "rarity": "uncommon",
+    "base_weight": 4,
+    "preferences": {
+      "water": 2,
+      "damp": 3,
+      "forest": 2,
+      "cover": 1,
+      "noise": -2,
+      "heat": -2
+    },
+    "setup_hint": "A damp, sheltered, quiet forest setup may draw out a sensitive visitor.",
+    "clues": [
+      "Tiny puddles appear with no rain.",
+      "Soft crying comes from the brush.",
+      "Wet tracks circle the clearing."
+    ],
+    "sanctuary_behavior": "make_puddle",
+    "moment": "rough_night",
+    "variants": [
+      "blue",
+      "mossy",
+      "raincloud"
+    ]
+  },
+  "dover_demon": {
+    "name": "Dovi",
+    "original_cryptid": "Dover Demon",
+    "rarity": "uncommon",
+    "base_weight": 3,
+    "preferences": {
+      "night": 3,
+      "natural": 2,
+      "cover": 2,
+      "forest": 1,
+      "light": -1,
+      "noise": -3
+    },
+    "setup_hint": "Quiet rocks and cover after dark give a shy watcher somewhere to perch.",
+    "clues": [
+      "Long fingers briefly curl around a stone wall.",
+      "Two enormous eyes reflect the moonlight.",
+      "Something small moves between the rocks."
+    ],
+    "sanctuary_behavior": "wall_watch",
+    "moment": "quiet_watcher",
+    "variants": [
+      "slate",
+      "moonlit",
+      "moss"
+    ]
+  },
+  "chupacabra": {
+    "name": "Chup Chup",
+    "original_cryptid": "Chupacabra",
+    "rarity": "rare",
+    "base_weight": 2,
+    "preferences": {
+      "night": 3,
+      "heat": 2,
+      "natural": 1,
+      "human": 1,
+      "water": -1
+    },
+    "setup_hint": "Warm nights and scattered human trinkets may interest a mischievous visitor.",
+    "clues": [
+      "Small clawed tracks circle the campsite.",
+      "A shiny object has been moved.",
+      "A spined silhouette darts behind a rock."
+    ],
+    "sanctuary_behavior": "hide_shinies",
+    "moment": "missing_trinket",
+    "variants": [
+      "desert",
+      "ash",
+      "sunset"
+    ]
+  },
+  "hodag": {
+    "name": "Hoddy",
+    "original_cryptid": "Hodag",
+    "rarity": "uncommon",
+    "base_weight": 4,
+    "preferences": {
+      "forest": 2,
+      "natural": 3,
+      "heat": 1,
+      "food": 2,
+      "cover": 1,
+      "noise": -1
+    },
+    "setup_hint": "Forest cover, warm rocks, and an interesting snack suit a stubborn little visitor.",
+    "clues": [
+      "Scratches appear on a warm boulder.",
+      "Something heavy rustles through the brush.",
+      "A snack disappears beside the rocks."
+    ],
+    "sanctuary_behavior": "warm_rock_nap",
+    "moment": "rock_digger",
+    "variants": [
+      "moss",
+      "northwoods",
+      "autumn"
+    ]
+  },
+  "thunderbird": {
+    "name": "Rumble",
+    "original_cryptid": "Thunderbird",
+    "rarity": "legendary",
+    "base_weight": 1,
+    "preferences": {
+      "storm": 5,
+      "height": 4,
+      "wind": 3,
+      "water": 1,
+      "open": 2,
+      "cover": -2
+    },
+    "setup_hint": "Watch high, open places when violent weather rolls in.",
+    "clues": [
+      "A shadow crosses the entire clearing.",
+      "Thunder answers from a cloudless direction.",
+      "An enormous feather is caught high in a tree."
+    ],
+    "sanctuary_behavior": "storm_perch",
+    "moment": "shadow_over_camp",
+    "variants": [
+      "storm",
+      "golden",
+      "midnight"
     ]
   }
 }

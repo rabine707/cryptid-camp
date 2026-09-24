@@ -115,6 +115,12 @@ func _build_home() -> void:
 	else:
 		var spots=[Vector2(.20,.64),Vector2(.48,.70),Vector2(.76,.61),Vector2(.52,.36)]
 		for i in range(mini(visitors.size(),4)): _add_visitor(layer,visitors[i],spots[i],i)
+	_add_camp_hotspots(layer)
+
+	var event_text := _maybe_random_event()
+	if not event_text.is_empty():
+		var event_card := _home_card("SOMETHING HAPPENED...", event_text)
+		page.add_child(event_card)
 
 	var bulletin := _home_card("CAMP BULLETIN", _camp_bulletin() + "\n\n" + _camp_progress_text())
 	page.add_child(bulletin)
@@ -152,7 +158,78 @@ func _build_home() -> void:
 	collection_note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	collection_note.pressed.connect(_open_areas)
 	footer.add_child(collection_note)
+
+	var wander := HBoxContainer.new()
+	wander.add_theme_constant_override("separation", 8)
+	page.add_child(wander)
+	for place in [["Ranger Cabin","ranger"],["Creek Bank","creek"],["Old Stump","stump"],["Notice Board","board"]]:
+		var place_button := _button(place[0], "wood")
+		place_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		place_button.pressed.connect(_visit_camp_place.bind(place[1]))
+		wander.add_child(place_button)
 	_add_build_badge()
+
+func _add_camp_hotspots(layer: Control) -> void:
+	var spots := [
+		["Trail Cam", "trailcam", Vector2(.10,.16)],
+		["Lost & Found", "lost", Vector2(.72,.18)],
+		["Campfire", "story", Vector2(.38,.80)]
+	]
+	for spot in spots:
+		var button := _button(str(spot[0]), "paper")
+		button.custom_minimum_size = Vector2(190, 62)
+		button.anchor_left = spot[2].x
+		button.anchor_right = spot[2].x
+		button.anchor_top = spot[2].y
+		button.anchor_bottom = spot[2].y
+		button.position = Vector2(-80, 0)
+		button.pressed.connect(_daily_activity.bind(str(spot[1])))
+		layer.add_child(button)
+
+func _visit_camp_place(place: String) -> void:
+	var key := _today_key()
+	var title := ""
+	var body := ""
+	match place:
+		"ranger":
+			title = "OLD RANGER CABIN"
+			var notes := ["A hand-drawn map has three trails circled, but no explanation.", "A dusty field guide is open to a page about unexplained lights.", "Someone pinned a note here: Listen first. Follow second.", "A mug is still warm. Nobody is inside."]
+			body = notes[abs(hash(key + place)) % notes.size()]
+		"creek":
+			title = "CREEK BANK"
+			var creek := ["Tiny wet tracks vanish at the waterline.", "A smooth stone has been carefully placed on top of another.", "Something croaks once from beneath the reeds, then goes silent.", "The water is clear. Something small darts under a root."]
+			body = creek[abs(hash(key + place)) % creek.size()]
+		"stump":
+			title = "THE OLD STUMP"
+			var stump := ["There is a bottle cap tucked into a crack like an offering.", "Three scratches mark the bark. They look fresh.", "Someone—or something—has arranged acorns in a neat circle.", "Nothing happens. Somehow that feels suspicious."]
+			body = stump[abs(hash(key + place)) % stump.size()]
+		"board":
+			title = "NOTICE BOARD"
+			var discovered := int(GameState.state.get("discovered_species", []).size())
+			var curios := int(GameState.state.get("curiosities", []).size())
+			var moments := int(GameState.state.get("moments", []).size())
+			body = "FIELD OFFICE TOTALS\nCryptids documented: %d / 48\nCurios recovered: %d\nCamp Moments: %d\n\nRumor of the day: %s" % [discovered, curios, moments, _daily_rumor()]
+	_show_activity_popup(title, body)
+
+func _daily_rumor() -> String:
+	var rumors := ["Two knocks were heard beyond the eastern trail.", "The pond was perfectly still at sunrise.", "A lantern turned itself toward the woods overnight.", "Fresh tracks appeared beside the clearing.", "Something keeps moving stones near the old trail.", "A local swears something enormous crossed the moon."]
+	return rumors[abs(hash(_today_key() + "world_rumor")) % rumors.size()]
+
+func _maybe_random_event() -> String:
+	var day_key := _today_key()
+	var daily: Dictionary = GameState.state.get("daily_camp", {})
+	var today: Dictionary = daily.get(day_key, {})
+	if today.get("random_event_seen", false):
+		return ""
+	# Stable per day: roughly half of days have a surprise on the first visit.
+	if abs(hash(day_key + "random_event")) % 100 >= 52:
+		return ""
+	var events := ["You find a strange feather snagged on the fence.", "Something rustles behind the supply shed. By the time you look, it is gone.", "A resident left a tiny object beside the campfire.", "Three unfamiliar footprints cross the path and stop abruptly.", "The camp lantern flickers twice even though there is no wind.", "A distant knock answers another from deeper in the woods."]
+	today["random_event_seen"] = true
+	daily[day_key] = today
+	GameState.state["daily_camp"] = daily
+	GameState.persist()
+	return events[abs(hash(day_key + "event_text")) % events.size()]
 
 func _daily_activity(kind: String) -> void:
 	var day_key := _today_key()
@@ -301,8 +378,7 @@ func _camp_bulletin() -> String:
 		lines.append("Field desk: New observations are waiting in your Journal.")
 	else:
 		lines.append("Field desk: The woods have been unusually quiet. A fresh setup might change that.")
-	var rumors := ["Someone heard two knocks beyond the eastern trail.", "The pond has been strangely still since dawn.", "A lantern near the path was turned around overnight.", "Fresh tracks were spotted near the edge of the clearing.", "Something keeps moving the stones beside the old trail."]
-	lines.append("Rumor: " + rumors[abs(hash(key + "rumor")) % rumors.size()])
+	lines.append("Rumor: " + _daily_rumor())
 	return "\n".join(lines)
 
 func _show_activity_popup(title: String, body: String) -> void:

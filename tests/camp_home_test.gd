@@ -17,6 +17,7 @@ func _initialize() -> void:
 	if failures > 0:
 		push_error("CAMP HOME FAILURES: %d" % failures)
 		quit(1)
+		return
 	print("ALL CAMP HOME TESTS PASSED")
 	quit(0)
 

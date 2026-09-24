@@ -112,7 +112,9 @@ func _refresh() -> void:
 		var empty := _label("This clearing is waiting for its first friend.", 31, CampStyle.CREAM)
 		empty.name = "ResidentEmpty"
 		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		empty.set_anchors_preset(Control.PRESET_CENTER_WIDE)
+		empty.set_anchors_preset(Control.PRESET_CENTER_TOP)
+		empty.anchor_left = 0.0
+		empty.anchor_right = 1.0
 		empty.offset_top = -30
 		empty.offset_bottom = 40
 		room_layer.add_child(empty)
